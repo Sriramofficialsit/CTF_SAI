@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexaCorp Recon Console</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">NX</div>
+    <div class="brand">NexaCorp <b>Active Recon Lab</b></div>
+  </header>
+
+  <nav class="toptabs">
+    <button class="top-btn active" data-top="site">Target Site</button>
+    <button class="top-btn" data-top="toolkit">Attacker Toolkit</button>
+  </nav>
+
+  <main class="page">
+    <section id="top-site" class="top-content active">
+      <div class="target-info">
+        <div><span>Target</span><b id="ti-host">...</b></div>
+        <div><span>IP</span><b id="ti-ip">...</b></div>
+        <div><span>Scope</span>This host only</div>
+      </div>
+      <div class="panel">
+        <h2>Welcome to NexaCorp</h2>
+        <p class="hint">NexaCorp builds software for regional logistics and freight companies. This is the company's public website. Use the Attacker Toolkit tab to research the organisation from the outside.</p>
+      </div>
+    </section>
+
+    <section id="top-toolkit" class="top-content">
+      <div class="subtabs" data-group="toolkit">
+        <button class="sub-btn active" data-sub="scan">Port Scanner</button>
+        <button class="sub-btn" data-sub="connect">Banner Grabber</button>
+      </div>
+      <div class="panel">
+        <div id="sub-scan" class="sub-content active" data-group="toolkit">
+        <h2>Port Scanner</h2>
+        <p class="hint">Scan a port range on the target. Try the common-ports preset first, then consider whether a wider sweep might reveal more.</p>
+        <form id="scan-form" class="tool-form">
+          <button type="button" id="preset-common">Scan common ports (1-1024)</button>
+        </form>
+        <form id="scan-range-form" class="tool-form">
+          <input type="number" name="start" placeholder="start port" min="1" max="65535" required>
+          <input type="number" name="end" placeholder="end port" min="1" max="65535" required>
+          <button type="submit">Scan range</button>
+        </form>
+        <pre id="scan-output" class="terminal-output">Results will appear here.</pre>
+        </div>
+        <div id="sub-connect" class="sub-content" data-group="toolkit">
+        <h2>Banner Grabber</h2>
+        <p class="hint">Connect to a specific open port and read its service banner.</p>
+        <form id="connect-form" class="tool-form">
+          <input type="number" name="port" placeholder="port number" min="1" max="65535" required>
+          <button type="submit">Connect</button>
+        </form>
+        <pre id="connect-output" class="terminal-output">Results will appear here.</pre>
+        <div id="ssh-panel" hidden>
+          <form id="ssh-login-form" class="tool-form">
+            <input type="text" name="username" placeholder="username" autocomplete="off">
+            <input type="password" name="password" placeholder="password">
+            <button type="submit">Login</button>
+          </form>
+          <div id="ssh-msg" class="hint"></div>
+          <div id="ssh-shell" hidden>
+            <div id="ssh-files" class="card-list"></div>
+            <pre id="ssh-cat" class="terminal-output" hidden></pre>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

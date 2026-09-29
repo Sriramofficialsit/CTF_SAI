@@ -1,0 +1,29 @@
+{
+  "slug": "nexacorp-active-recon",
+  "title": "NexaCorp Recon Console",
+  "topic": "Footprinting & Reconnaissance - Active",
+  "vuln_class": "port-scan-banner-grab",
+  "difficulty": "beginner",
+  "flag": "FLAG{ssh_backup_account_left_enabled}",
+  "grading": "server-side-submission",
+  "submit_endpoint": "/api/submit",
+  "hints": [
+    {
+      "cost": 5,
+      "text": "The common-ports preset (1-1024) won't cover every port a service could be running on."
+    },
+    {
+      "cost": 10,
+      "text": "One open port is a decoy that says so directly in its banner. Keep scanning wider."
+    },
+    {
+      "cost": 15,
+      "text": "Port 31337's banner mentions an account left enabled on another service. Where else on this host could you use it?"
+    },
+    {
+      "cost": 20,
+      "text": "SSH is open on port 22. Once you're in, look at what's in the home directory."
+    }
+  ],
+  "companion_lab": "nexacorp-passive-recon"
+}

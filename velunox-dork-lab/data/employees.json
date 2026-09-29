@@ -1,0 +1,8 @@
+[
+  { "id": "VLX-1042", "name": "Sarah Chen", "department": "Marketing", "role": "Marketing Coordinator" },
+  { "id": "VLX-1077", "name": "Daniel Osei", "department": "IT", "role": "IT Systems Administrator" },
+  { "id": "VLX-1090", "name": "Priya Nandakumar", "department": "Finance", "role": "Financial Analyst" },
+  { "id": "VLX-1123", "name": "Elena Petrova", "department": "HR", "role": "HR Generalist" },
+  { "id": "VLX-1140", "name": "James Whitmore", "department": "Operations", "role": "Operations Manager" },
+  { "id": "VLX-1158", "name": "Grace Halvorsen", "department": "Sales", "role": "Account Executive" }
+]

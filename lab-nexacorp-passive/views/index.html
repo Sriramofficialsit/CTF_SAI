@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexaCorp Recon Lab</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">NX</div>
+    <div class="brand">NexaCorp <b>Recon Lab</b></div>
+  </header>
+
+  <nav class="toptabs">
+    <button class="top-btn active" data-top="site">Target Site</button>
+    <button class="top-btn" data-top="toolkit">Attacker Toolkit</button>
+  </nav>
+
+  <main class="page">
+    <section id="top-site" class="top-content active">
+      <div class="target-info">
+        <div><span>Target</span>NexaCorp</div>
+        <div><span>Domain</span>nexacorp.test</div>
+        <div><span>Scope</span>*.nexacorp.test</div>
+      </div>
+      <form id="addr-form" class="tool-form addr">
+        <button type="button" id="addr-home" title="Home">&#8962;</button>
+        <input id="addr-input" type="text" value="http://nexacorp.test/" aria-label="Address bar" spellcheck="false">
+        <button type="submit">Go</button>
+      </form>
+      <div id="browser-view" class="panel" hidden></div>
+      <div id="site-home" class="panel site">
+        <h2>Welcome to NexaCorp</h2>
+        <p class="hint">NexaCorp builds software for regional logistics and freight companies. This is the company's public website. Use the Attacker Toolkit tab to research the organisation, and the address bar above to visit hosts you discover.</p>
+        <h3>What we do</h3>
+        <div class="grid3">
+          <div class="card"><h3>Route Planner</h3><p>Plan multi-stop freight routes and cut empty miles.</p></div>
+          <div class="card"><h3>Dock Scheduler</h3><p>Book dock slots and reduce truck wait times.</p></div>
+          <div class="card"><h3>Customer Portal</h3><p>Real-time shipment tracking for your customers.</p></div>
+        </div>
+        <h3>Latest news</h3>
+        <div class="card-list">
+          <div class="card"><div class="meta">2026-06-10</div><p>NexaCorp opens a second office in Austin to support growing demand.</p></div>
+          <div class="card"><div class="meta">2026-05-21</div><p>Customer Portal 4.0 launches with a redesigned tracking map.</p></div>
+          <div class="card"><div class="meta">2026-04-02</div><p>NexaCorp named a regional finalist for logistics software of the year.</p></div>
+        </div>
+        <h3>Contact</h3>
+        <p class="hint">Phone: +1 555-0100 &middot; Austin, TX</p>
+      </div>
+    </section>
+
+    <section id="top-toolkit" class="top-content">
+      <div class="subtabs" data-group="toolkit">
+        <button class="sub-btn active" data-sub="whois">WHOIS Lookup</button>
+        <button class="sub-btn" data-sub="dns">DNS Zone</button>
+        <button class="sub-btn" data-sub="jobs">Job Seeking Portal</button>
+        <button class="sub-btn" data-sub="network">Professional Network</button>
+        <button class="sub-btn" data-sub="leaks">Public Paste Archive</button>
+      </div>
+      <div class="panel">
+        <div id="sub-whois" class="sub-content active" data-group="toolkit">
+          <h2>WHOIS Lookup</h2>
+          <p class="hint">Query public domain registration records. No connection is made to the target - this reads registry data only.</p>
+          <form id="whois-form" class="tool-form">
+            <input type="text" name="domain" placeholder="e.g. nexacorp.test" required>
+            <button type="submit">Lookup</button>
+          </form>
+          <pre id="whois-output" class="terminal-output">Results will appear here.</pre>
+        </div>
+        <div id="sub-dns" class="sub-content" data-group="toolkit">
+          <h2>DNS Zone Lookup</h2>
+          <p class="hint">Enumerate DNS records for a domain, similar to <code>dig ANY</code>.</p>
+          <form id="dns-form" class="tool-form">
+            <input type="text" name="domain" placeholder="e.g. nexacorp.test" required>
+            <button type="submit">Query</button>
+          </form>
+          <pre id="dns-output" class="terminal-output">Results will appear here.</pre>
+        </div>
+        <div id="sub-jobs" class="sub-content" data-group="toolkit">
+          <h2>Job Seeking Portal</h2>
+          <p class="hint">Browse open positions from employers across the country.</p>
+          <form id="jobs-form" class="tool-form">
+            <input type="text" name="q" placeholder="Search by company, job title, keyword or location">
+            <button type="submit">Search jobs</button>
+          </form>
+          <div id="jobs-count" class="hint"></div>
+          <div id="jobs-list" class="card-list"></div>
+        </div>
+        <div id="sub-network" class="sub-content" data-group="toolkit">
+          <div class="li-bar"><span class="li-logo">Link<b>Up</b></span>
+            <form id="people-form" class="li-search"><input type="text" name="q" placeholder="Search people, companies or titles"><button type="submit">Search</button></form>
+          </div>
+          <div id="people-list" class="card-list"></div>
+          <div id="people-detail" class="li-profile" hidden></div>
+        </div>
+        <div id="sub-leaks" class="sub-content" data-group="toolkit">
+          <h2>Public Paste Archive</h2>
+          <p class="hint">Recent public pastes indexed from a third-party paste site. NexaCorp does not host or control this content.</p>
+          <form id="pastes-form" class="tool-form">
+            <input type="text" name="q" placeholder="Search pastes by title, author or text">
+            <button type="submit">Search</button>
+          </form>
+          <div id="pastes-list" class="card-list"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

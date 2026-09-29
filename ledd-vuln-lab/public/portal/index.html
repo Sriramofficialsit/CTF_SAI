@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="generator" content="WordPress 6.4.2"/>
+  <title>LEDD Corp – Employee Management Portal</title>
+  <!-- TODO: Remove backup plugin after migration is complete – IT Dept -->
+  <!-- Duplicator v1.3.26 active — migration packages saved to wp-content/plugins/duplicator/ -->
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f6fa;color:#1a202c;line-height:1.6}
+
+    /* NAV */
+    nav{background:#1e3a5f;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;box-shadow:0 2px 8px #0003}
+    .nav-logo{color:#fff;font-size:20px;font-weight:700;letter-spacing:.5px;text-decoration:none;display:flex;align-items:center;gap:10px}
+    .nav-logo .badge-l{background:#3b82f6;color:#fff;border-radius:6px;padding:2px 9px;font-size:17px;font-weight:800}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{color:#cbd5e0;text-decoration:none;font-size:14px;transition:.2s}
+    .nav-links a:hover{color:#fff}
+    .nav-login{background:#3b82f6;color:#fff!important;border-radius:6px;padding:7px 18px!important;font-size:14px!important;transition:.2s!important}
+    .nav-login:hover{background:#2563eb!important}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);color:#fff;padding:80px 40px 70px;text-align:center}
+    .hero h1{font-size:38px;font-weight:700;margin-bottom:14px;letter-spacing:-.5px}
+    .hero p{font-size:17px;color:#bfdbfe;max-width:560px;margin:0 auto 32px}
+    .hero-btn{display:inline-block;background:#fff;color:#1e3a5f;font-weight:600;border-radius:8px;padding:13px 36px;text-decoration:none;font-size:15px;transition:.2s}
+    .hero-btn:hover{background:#dbeafe}
+    .hero-sub{font-size:13px;color:#93c5fd;margin-top:14px}
+
+    /* STATS */
+    .stats{display:flex;justify-content:center;gap:0;background:#fff;border-bottom:1px solid #e2e8f0}
+    .stat{flex:1;max-width:200px;text-align:center;padding:28px 16px;border-right:1px solid #e2e8f0}
+    .stat:last-child{border-right:none}
+    .stat-n{font-size:28px;font-weight:700;color:#1e3a5f}
+    .stat-l{font-size:13px;color:#64748b;margin-top:4px}
+
+    /* CARDS */
+    .section{padding:60px 40px;max-width:1100px;margin:0 auto}
+    .section h2{font-size:24px;font-weight:700;color:#1e293b;margin-bottom:8px}
+    .section-sub{color:#64748b;margin-bottom:36px;font-size:15px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;transition:.2s}
+    .card:hover{box-shadow:0 4px 20px #0001;transform:translateY(-2px)}
+    .card-icon{font-size:32px;margin-bottom:14px}
+    .card h3{font-size:16px;font-weight:600;margin-bottom:8px;color:#1e293b}
+    .card p{font-size:14px;color:#64748b;line-height:1.6}
+
+    /* NOTICE */
+    .notice-bar{background:#fef3c7;border-bottom:1px solid #fcd34d;padding:12px 40px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:10px}
+    .notice-bar strong{font-weight:600}
+
+    /* FOOTER */
+    footer{background:#1e293b;color:#94a3b8;padding:40px;margin-top:80px}
+    .footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .footer-logo{font-size:16px;font-weight:700;color:#e2e8f0}
+    .footer-links{display:flex;gap:24px;list-style:none}
+    .footer-links a{color:#94a3b8;text-decoration:none;font-size:13px}
+    .footer-links a:hover{color:#e2e8f0}
+    .footer-wp{font-size:12px;color:#475569;margin-top:20px;text-align:center;border-top:1px solid #334155;padding-top:20px}
+    .footer-wp a{color:#60a5fa;text-decoration:none}
+
+    @media(max-width:700px){.cards{grid-template-columns:1fr}.stats{flex-wrap:wrap}.stat{min-width:50%}.footer-inner{flex-direction:column;gap:20px}}
+  </style>
+</head>
+<body>
+
+<div class="notice-bar">
+  📢 <strong>IT Notice:</strong> Portal migration to new infrastructure is scheduled for Q1 2025. Please save all documents locally before the cutover date.
+</div>
+
+<nav>
+  <a class="nav-logo" href="/portal/">
+    <span class="badge-l">L</span>
+    LEDD Corp
+  </a>
+  <ul class="nav-links">
+    <li><a href="/portal/">Home</a></li>
+    <li><a href="/portal/#departments">Departments</a></li>
+    <li><a href="/portal/#announcements">Announcements</a></li>
+    <li><a href="/portal/wp-login.php" class="nav-login">Employee Login</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1>Welcome to LEDD Employee Portal</h1>
+  <p>Your central hub for HR documents, team directories, IT requests, and internal announcements.</p>
+  <a class="hero-btn" href="/portal/wp-login.php">Login to Your Account</a>
+  <div class="hero-sub">Secure access for LEDD Corp employees only</div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-n">1,240</div><div class="stat-l">Employees</div></div>
+  <div class="stat"><div class="stat-n">14</div><div class="stat-l">Departments</div></div>
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">Office Locations</div></div>
+  <div class="stat"><div class="stat-n">99.8%</div><div class="stat-l">Portal Uptime</div></div>
+</div>
+
+<div class="section">
+  <h2>Portal Services</h2>
+  <p class="section-sub">Everything you need in one place. Log in to access full features.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>HR Self-Service</h3>
+      <p>View payslips, submit leave requests, update personal details, and download HR forms.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <h3>Document Library</h3>
+      <p>Access company policies, onboarding packs, IT guidelines, and department SOPs.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💻</div>
+      <h3>IT Support Desk</h3>
+      <p>Raise tickets, track requests, reset credentials, and view known issue advisories.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📣</div>
+      <h3>Announcements</h3>
+      <p>Stay updated with company-wide news, policy changes, and event notifications.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h3>Team Directory</h3>
+      <p>Find colleagues by name, department, or role. Access contact details and reporting lines.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Performance Hub</h3>
+      <p>View objectives, submit appraisal feedback, and track development goals.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">LEDD Corp</div>
+    <ul class="footer-links">
+      <li><a href="#">Privacy Policy</a></li>
+      <li><a href="#">IT Support</a></li>
+      <li><a href="/portal/wp-login.php">Admin Login</a></li>
+    </ul>
+  </div>
+  <div class="footer-wp">
+    Proudly powered by <a href="https://wordpress.org" target="_blank">WordPress</a> &nbsp;|&nbsp; © 2024 LEDD Corp. All rights reserved.
+  </div>
+</footer>
+
+</body>
+</html>

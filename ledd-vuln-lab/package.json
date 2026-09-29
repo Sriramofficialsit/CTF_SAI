@@ -1,0 +1,8 @@
+{
+  "name": "ledd-vuln-lab",
+  "version": "1.0.0",
+  "description": "LEDD Corp Employee Portal – CVE/CWE Vulnerability Lab for Cyberthulir",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.18.2" }
+}

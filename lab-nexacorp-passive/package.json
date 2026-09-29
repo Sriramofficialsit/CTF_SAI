@@ -1,0 +1,12 @@
+{
+  "name": "lab-nexacorp-passive",
+  "version": "1.0.0",
+  "description": "Cyberthulir lab - Passive Recon / OSINT against a simulated company",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

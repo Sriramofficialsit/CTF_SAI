@@ -1,0 +1,12 @@
+{
+  "name": "lab-nexacorp-active",
+  "version": "1.0.0",
+  "description": "Cyberthulir lab - Active Recon (port scanning / banner grabbing) against a simulated host",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FTP :21 — LEDD-FTPD</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--dim:#8b949e;--text:#c9d1d9}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;padding:24px}
+    .window{max-width:760px;margin:0 auto}
+    .titlebar{background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;padding:12px 16px;display:flex;align-items:center;gap:8px}
+    .dot{width:13px;height:13px;border-radius:50%}
+    .dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
+    .win-title{margin:0 auto;color:var(--dim);font-size:13px}
+    .terminal{background:var(--bg);border:1px solid var(--border);border-radius:0 0 10px 10px;padding:24px;min-height:360px}
+    .line{line-height:1.8;font-size:14px}
+    .g{color:var(--green)}.r{color:var(--red)}.y{color:var(--yellow)}.d{color:var(--dim)}
+    .dead-end{margin-top:28px;background:#ff514920;border:1px solid #f8514966;border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:14px 18px;font-size:13px}
+    .dead-end .label{color:var(--red);font-weight:bold;margin-bottom:4px}
+    .dead-end p{color:var(--dim);line-height:1.6}
+    .back{display:inline-block;margin-top:20px;color:var(--green);text-decoration:none;font-size:13px}
+    .back:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span class="win-title">ftp 10.13.37.50 — port 21</span>
+  </div>
+  <div class="terminal">
+    <div class="line g">Connected to 10.13.37.50.</div>
+    <div class="line d">220 LEDD-FTPD ProFTPD 1.3.5e Server (LEDD Corp Internal FTP) [10.13.37.50]</div>
+    <div class="line d">Name (10.13.37.50:attacker): <span class="g">anonymous</span></div>
+    <div class="line r">530 Login incorrect.</div>
+    <div class="line d">Login failed.</div>
+    <div class="line d">Name (10.13.37.50:attacker): <span class="g">admin</span></div>
+    <div class="line r">530 Login incorrect.</div>
+    <div class="line d">Login failed.</div>
+    <div class="line d">Name (10.13.37.50:attacker): <span class="g">ledd</span></div>
+    <div class="line r">530 Login incorrect.</div>
+    <div class="line d">Login failed.</div>
+    <div class="line d">ftp&gt; <span class="g">quit</span></div>
+    <div class="line d">221 Goodbye.</div>
+
+    <div class="dead-end">
+      <div class="label">⛔ Dead End</div>
+      <p>This FTP service does not allow anonymous login and rejects common credentials.
+      No password discovery vector found here — there is no exploitable misconfiguration on this service.
+      Look elsewhere.</p>
+    </div>
+    <a class="back" href="/">← Back to scan results</a>
+  </div>
+</div>
+</body>
+</html>

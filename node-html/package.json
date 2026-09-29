@@ -1,0 +1,12 @@
+{
+  "name": "iodr-node-html-ctf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plain HTML vulnerable storefront security lab",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

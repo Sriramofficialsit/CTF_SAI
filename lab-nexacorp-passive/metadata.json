@@ -1,0 +1,28 @@
+{
+  "slug": "nexacorp-passive-recon",
+  "title": "NexaCorp Recon Lab",
+  "topic": "Footprinting & Reconnaissance - OSINT to Access",
+  "vuln_class": "osint-correlation",
+  "difficulty": "intermediate",
+  "flag": "FLAG{jenkins_creds_leaked_in_public_paste}",
+  "grading": "flag-string-match",
+  "hints": [
+    {
+      "cost": 5,
+      "text": "Check the DNS zone for subdomains that aren't linked anywhere on the public site."
+    },
+    {
+      "cost": 10,
+      "text": "A job posting says what software runs on that host. Then look at who at NexaCorp would maintain it."
+    },
+    {
+      "cost": 15,
+      "text": "People often list their handles on other sites in their profile's contact info. Search the paste archive by author."
+    },
+    {
+      "cost": 20,
+      "text": "Once you have a hostname and credentials, use the address bar on the Target Site tab."
+    }
+  ],
+  "companion_lab": "nexacorp-active-recon"
+}

@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberThulir — 2-Day Workshop (Beginner)</title>
+<style>
+:root{
+  --navy:#131A2B; --navy-soft:#33405C; --ink:#1C2333;
+  --pink:#EC1E79; --pink-soft:#FDE9F1; --pink-line:#F7C9DE;
+  --purple:#7C3AED; --purple-soft:#F1EBFC; --purple-line:#DCC9F7;
+  --green:#16A34A; --green-soft:#E9F7EF; --green-line:#BEE6CC;
+  --amber:#D97706; --amber-soft:#FEF3E2;
+  --red:#DC2626; --red-soft:#FDECEC;
+  --grey:#6B7280; --grey-line:#E3E6EC; --bg-card:#F7F8FB;
+  --white:#ffffff;
+  --radius:16px; --radius-sm:10px;
+  --shadow: 0 1px 2px rgba(19,26,43,.06), 0 8px 24px rgba(19,26,43,.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  background:#F4F5F9;
+  color:var(--ink);
+  min-height:100vh;
+}
+#app{max-width:920px;margin:0 auto;padding:0 16px 60px;}
+.hidden{display:none !important;}
+button{font-family:inherit;cursor:pointer;}
+::selection{background:var(--pink-soft);}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:var(--white);
+  border-bottom:1px solid var(--grey-line);
+  padding:10px 0;
+  margin-bottom:18px;
+}
+.topbar-inner{max-width:920px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--navy);white-space:nowrap;}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));}
+.stat{display:flex;align-items:center;gap:5px;font-weight:700;font-size:13px;color:var(--navy-soft);background:var(--bg-card);border:1px solid var(--grey-line);border-radius:999px;padding:5px 11px;}
+.stat.hearts{color:var(--red);}
+.stat.xp{color:var(--pink);}
+.progressbar-wrap{flex:1;height:8px;background:var(--grey-line);border-radius:999px;overflow:hidden;}
+.progressbar-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:999px;transition:width .4s ease;}
+.backbtn{background:none;border:none;color:var(--navy-soft);font-size:13px;font-weight:700;padding:6px 4px;}
+.backbtn:hover{color:var(--pink);}
+
+/* ---------- path (home) view ---------- */
+.hero{
+  background:linear-gradient(135deg,var(--navy) 0%,#1c2745 100%);
+  border-radius:20px;color:#fff;padding:28px 26px;margin-bottom:22px;position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.55),transparent 70%);}
+.hero h1{margin:0 0 6px;font-size:22px;position:relative;}
+.hero p{margin:0;color:#C7CCDA;font-size:13.5px;max-width:520px;position:relative;line-height:1.5;}
+.hero-stats{display:flex;gap:22px;margin-top:16px;position:relative;flex-wrap:wrap;}
+.hero-stats div{font-size:12px;color:#9AA3B8;}
+.hero-stats b{display:block;color:#fff;font-size:19px;}
+
+.path{display:flex;flex-direction:column;gap:10px;}
+.day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 4px 10px;}
+.day-head span{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:800;font-size:12px;letter-spacing:.05em;border-radius:999px;padding:7px 15px;}
+.day-head small{color:var(--grey);font-weight:700;font-size:12px;}
+.day-head.day2 span{background:linear-gradient(135deg,var(--navy),var(--navy-soft));}
+.module-row{
+  display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--grey-line);
+  border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);
+  transition:transform .15s ease;cursor:pointer;
+}
+.module-row:hover{transform:translateY(-2px);}
+.module-row.locked{opacity:.55;cursor:not-allowed;}
+.module-row.locked:hover{transform:none;}
+.m-badge{
+  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#fff;flex-shrink:0;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+}
+.m-badge.done{background:linear-gradient(135deg,var(--green),#0f9c58);}
+.m-badge.locked{background:#C9CDD8;}
+.m-info{flex:1;min-width:0;}
+.m-info h3{margin:0 0 2px;font-size:14.5px;color:var(--navy);}
+.m-info p{margin:0;font-size:12px;color:var(--grey);}
+.m-meta{font-size:11px;color:var(--grey);white-space:nowrap;}
+.m-check{font-size:20px;color:var(--green);}
+.m-lock{font-size:16px;color:#AEB4C2;}
+
+/* ---------- module detail view ---------- */
+.module-head{
+  background:var(--navy);color:#fff;border-radius:16px;padding:18px 20px;margin-bottom:16px;
+}
+.module-head .kicker{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--pink);text-transform:uppercase;}
+.module-head h2{margin:6px 0 4px;font-size:20px;}
+.module-head p{margin:0;color:#C7CCDA;font-size:13px;}
+
+.lesson-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.lesson-row{
+  display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--grey-line);
+  border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow);
+}
+.lesson-row.locked{opacity:.5;cursor:not-allowed;}
+.l-num{
+  width:34px;height:34px;border-radius:10px;background:var(--pink-soft);color:var(--pink);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;
+}
+.l-num.done{background:var(--green-soft);color:var(--green);}
+.l-title{flex:1;font-size:13.5px;font-weight:700;color:var(--navy);}
+.l-sub{font-size:11px;color:var(--grey);}
+
+.challenge-card{
+  background:var(--purple-soft);border:1px solid var(--purple-line);border-radius:14px;padding:16px;
+  display:flex;align-items:center;gap:14px;cursor:pointer;
+}
+.challenge-card.locked{opacity:.55;cursor:not-allowed;}
+.challenge-icon{font-size:22px;}
+.challenge-card h4{margin:0 0 2px;font-size:13.5px;color:var(--navy);}
+.challenge-card p{margin:0;font-size:12px;color:var(--navy-soft);}
+
+/* ---------- lesson flow ---------- */
+.card{
+  background:var(--white);border:1px solid var(--grey-line);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow);margin-bottom:16px;
+}
+.step-pill{
+  display:inline-flex;align-items:center;gap:6px;color:#fff;font-weight:800;font-size:10.5px;
+  letter-spacing:.05em;text-transform:uppercase;padding:6px 12px;border-radius:8px;margin-bottom:12px;
+}
+.lesson-header{font-size:11px;font-weight:800;color:var(--pink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;}
+.lesson-title{font-size:18px;font-weight:800;color:var(--navy);margin:0 0 14px;}
+
+.brief-box{background:var(--pink-soft);border:1px solid var(--pink-line);border-radius:12px;padding:14px 16px;font-style:italic;color:var(--navy);font-size:14px;line-height:1.55;}
+.concept-box{background:var(--bg-card);border:1px solid var(--grey-line);border-radius:12px;padding:14px 16px;}
+.concept-box p{font-size:13.5px;line-height:1.6;color:var(--navy-soft);margin:0 0 10px;}
+.concept-box p:last-child{margin-bottom:0;}
+.concept-box b{color:var(--navy);}
+.example-title{font-weight:800;font-size:14.5px;color:var(--navy);margin:0 0 8px;}
+.example-box p{font-size:13.5px;line-height:1.65;color:var(--navy-soft);margin:0 0 10px;}
+
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.btn{
+  border:none;border-radius:12px;padding:12px 22px;font-weight:800;font-size:13.5px;
+  display:inline-flex;align-items:center;gap:6px;transition:transform .1s ease,filter .15s ease;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--purple);color:#fff;}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-primary:disabled{background:#D7D2E8;cursor:not-allowed;}
+.btn-ghost{background:none;color:var(--navy-soft);border:1px solid var(--grey-line);}
+.btn-ghost:hover{background:var(--bg-card);}
+.btn-green{background:var(--green);color:#fff;}
+
+/* ---------- game screens ---------- */
+.game-title{font-size:16px;font-weight:800;color:var(--navy);margin:0 0 4px;}
+.game-desc{font-size:13px;color:var(--grey);margin:0 0 16px;}
+.game-board{display:flex;flex-direction:column;gap:16px;}
+
+.item-pool{display:flex;flex-wrap:wrap;gap:8px;}
+.item-chip{
+  background:var(--white);border:2px solid var(--grey-line);border-radius:10px;padding:9px 14px;
+  font-size:12.5px;font-weight:600;color:var(--navy);cursor:pointer;transition:all .15s ease;user-select:none;
+}
+.item-chip:hover{border-color:var(--purple);}
+.item-chip.selected{border-color:var(--purple);background:var(--purple-soft);}
+.item-chip.placed{opacity:0;pointer-events:none;height:0;padding:0;border:0;margin:0;overflow:hidden;}
+
+.buckets{display:grid;gap:10px;}
+.buckets.b2{grid-template-columns:1fr 1fr;}
+.buckets.b3{grid-template-columns:1fr 1fr 1fr;}
+.buckets.b4{grid-template-columns:1fr 1fr;}
+@media(max-width:620px){.buckets.b3{grid-template-columns:1fr;} .buckets.b4{grid-template-columns:1fr;}}
+.bucket{
+  border:2px dashed var(--grey-line);border-radius:12px;padding:10px;min-height:96px;background:var(--bg-card);
+  transition:border-color .15s ease,background .15s ease;
+}
+.bucket.dragover{border-color:var(--purple);background:var(--purple-soft);}
+.bucket h5{margin:0 0 8px;font-size:11.5px;font-weight:800;color:var(--navy-soft);text-transform:uppercase;letter-spacing:.03em;}
+.bucket .placed-item{
+  background:#fff;border:1px solid var(--grey-line);border-radius:8px;padding:7px 10px;font-size:12px;margin-bottom:6px;
+  display:flex;justify-content:space-between;align-items:center;gap:6px;
+}
+.bucket .placed-item.correct{border-color:var(--green-line);background:var(--green-soft);color:#0f6b32;}
+.bucket .placed-item.wrong{border-color:#F5C2C2;background:var(--red-soft);color:#8a1f1f;}
+
+.order-list{display:flex;flex-direction:column;gap:8px;}
+.order-slot{
+  border:2px dashed var(--grey-line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--grey);
+  min-height:20px;background:var(--bg-card);
+}
+.order-slot.filled{border-style:solid;border-color:var(--purple-line);background:#fff;color:var(--navy);font-weight:700;display:flex;gap:10px;align-items:center;}
+.order-slot .step-no{width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:620px){.match-grid{grid-template-columns:1fr;}}
+.match-col h5{font-size:11px;text-transform:uppercase;color:var(--grey);margin:0 0 8px;letter-spacing:.04em;}
+.match-item{
+  background:#fff;border:2px solid var(--grey-line);border-radius:10px;padding:10px 12px;font-size:12.5px;
+  margin-bottom:8px;cursor:pointer;transition:all .15s ease;
+}
+.match-item.selected{border-color:var(--purple);background:var(--purple-soft);}
+.match-item.matched{border-color:var(--green-line);background:var(--green-soft);color:#0f6b32;cursor:default;}
+.match-item.wrongflash{border-color:#F5C2C2;background:var(--red-soft);}
+
+.feedback{margin-top:14px;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:var(--green-soft);color:#0f6b32;border:1px solid var(--green-line);}
+.feedback.bad{background:var(--red-soft);color:#8a1f1f;border:1px solid #F5C2C2;}
+
+/* ---------- quiz ---------- */
+.quiz-q{font-size:14.5px;font-weight:800;color:var(--navy);margin:0 0 12px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:10px;border:2px solid var(--grey-line);border-radius:12px;
+  padding:12px 14px;margin-bottom:9px;cursor:pointer;font-size:13.5px;color:var(--navy-soft);transition:all .15s ease;
+}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt .letter{width:22px;height:22px;border-radius:50%;border:2px solid var(--grey-line);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;color:var(--grey);}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-soft);color:#0f6b32;}
+.quiz-opt.correct .letter{border-color:var(--green);background:var(--green);color:#fff;}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-soft);color:#8a1f1f;}
+.quiz-opt.wrong .letter{border-color:var(--red);background:var(--red);color:#fff;}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-progress{display:flex;gap:5px;margin-bottom:14px;}
+.quiz-progress span{flex:1;height:5px;border-radius:99px;background:var(--grey-line);}
+.quiz-progress span.done{background:var(--green);}
+.quiz-progress span.current{background:var(--purple);}
+
+/* ---------- challenge / terminal ---------- */
+.terminal{
+  background:#0c1220;color:#c9f7d4;border-radius:12px;padding:16px;font-family:'Consolas','Monaco',monospace;
+  font-size:12.5px;line-height:1.65;overflow-x:auto;white-space:pre-wrap;margin-bottom:14px;
+}
+.terminal .prompt{color:#7dd3fc;}
+.terminal .cmd{color:#fde68a;}
+.terminal .out{color:#c9f7d4;}
+.cmd-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.cmd-btn{
+  background:var(--navy);color:#fff;border:none;border-radius:8px;padding:8px 13px;font-size:12px;font-family:'Consolas','Monaco',monospace;
+}
+.cmd-btn:disabled{background:#C9CDD8;color:#fff;cursor:not-allowed;}
+.cmd-btn.used{background:#3a4560;}
+.answer-row{display:flex;gap:10px;flex-wrap:wrap;}
+.answer-input{
+  flex:1;min-width:220px;border:2px solid var(--grey-line);border-radius:10px;padding:11px 14px;font-size:13.5px;
+}
+.answer-input:focus{outline:none;border-color:var(--purple);}
+
+/* ---------- badge / complete screens ---------- */
+.complete-wrap{text-align:center;padding:30px 10px;}
+.complete-emoji{font-size:54px;margin-bottom:6px;}
+.complete-wrap h2{margin:0 0 6px;font-size:20px;color:var(--navy);}
+.complete-wrap p{color:var(--grey);font-size:13.5px;margin:0 0 18px;}
+.xp-pill{display:inline-flex;align-items:center;gap:6px;background:var(--pink-soft);color:var(--pink);font-weight:800;border-radius:999px;padding:8px 18px;font-size:14px;margin-bottom:22px;}
+.badge-card{
+  display:inline-flex;align-items:center;gap:12px;background:var(--green-soft);border:1px solid var(--green-line);
+  border-radius:14px;padding:14px 22px;margin-bottom:22px;
+}
+.badge-card .icon{font-size:26px;}
+.badge-card b{color:var(--navy);font-size:14px;display:block;}
+.badge-card span{color:var(--grey);font-size:11.5px;}
+
+/* hearts lost shake */
+@keyframes shake{10%,90%{transform:translateX(-1px);}20%,80%{transform:translateX(2px);}30%,50%,70%{transform:translateX(-4px);}40%,60%{transform:translateX(4px);}}
+.shake{animation:shake .5s;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button class="backbtn" id="backBtn">&larr; Back</button>
+    <div class="brand"><span class="dot"></span>CyberThulir</div>
+    <div class="progressbar-wrap"><div class="progressbar-fill" id="topProgress" style="width:0%"></div></div>
+    <div class="stat hearts">&#9829; <span id="heartsVal">5</span></div>
+    <div class="stat xp">&#9889; <span id="xpVal">0</span> XP</div>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+/* =========================================================================
+   DATA — Beginner Tier (10 modules / 30 lessons / 10 practical challenges)
+   ========================================================================= */
+const MODULES = [
+{
+  id:0, num:"01", day:1, title:"Introduction to Ethical Hacking & Red Team Fundamentals",
+  focus:"What ethical hacking is, the domains it covers, testing types, and red team fundamentals.",
+  lessons:[
+    {
+      title:"What Is Ethical Hacking?",
+      brief:"Before any tools, learn what makes hacking 'ethical' — and what ethical hackers actually do day to day.",
+      concept:[
+        "<b>Ethical hacking</b> is the authorized practice of testing systems, networks and applications to identify and fix security weaknesses before malicious attackers exploit them. Ethical hackers use real hacking techniques — with permission — to strengthen cybersecurity and protect digital assets.",
+        "<b>Works of ethical hackers:</b>",
+        "<b>1. Penetration testing</b> — conducts controlled tests that simulate real-world attacks to evaluate how well security controls hold up.",
+        "<b>2. Vulnerability assessment</b> — performs systematic reviews to identify misconfigurations, software flaws and exploitable weaknesses.",
+        "<b>3. Network & application analysis</b> — analyzes network and application security to detect attack vectors and unauthorized access risks.",
+        "<b>4. Remediation & retesting</b> — provides remediation recommendations and validates security fixes through controlled retesting."
+      ],
+      exampleTitle:"Nimbus Health Hires Testers",
+      example:[
+        "Nimbus Health suspects its patient portal could be attacked. Instead of waiting for criminals, it hires ethical hackers with written permission to attack the portal first.",
+        "The team runs a penetration test, lists the misconfigurations they find, recommends fixes, and then retests to confirm each fix actually works."
+      ],
+      game:{type:"match", title:"Match the Ethical Hacker Task",
+        desc:"Tap a task, then tap what it means.",
+        pairs:[
+          ["Penetration testing","Simulate real-world attacks, evaluate controls"],
+          ["Vulnerability assessment","Find misconfigurations and software flaws"],
+          ["Network & app analysis","Detect attack vectors and access risks"],
+          ["Remediation & retesting","Recommend fixes, then verify they work"],
+        ]},
+      quiz:[
+        {q:"Ethical hacking is best described as:",opts:["Unauthorized testing for fun","Authorized testing to find and fix weaknesses before attackers do","Malware development","Bypassing all security controls"],a:1},
+        {q:"Which task evaluates how well security controls hold up under a simulated attack?",opts:["Vulnerability assessment","Penetration testing","Password reset","Software installation"],a:1},
+        {q:"After recommending fixes, ethical hackers:",opts:["Move on immediately","Validate the fixes through controlled retesting","Delete the report","Publish the flaws online"],a:1},
+      ]
+    },
+    {
+      title:"Hacking Domains & Testing Types",
+      brief:"Hacking splits into domains by target — and into box types by how much the tester is told.",
+      concept:[
+        "<b>Types by domain:</b>",
+        "<b>Web Application Hacking</b> — finding flaws in websites, web apps, and APIs.",
+        "<b>Network Hacking</b> — analyzing wired and wireless networks, routers, switches, and firewalls.",
+        "<b>Cloud Hacking</b> — securing cloud environments like AWS, Microsoft Azure, and Google Cloud.",
+        "<b>System Hacking</b> — targeting Windows, Linux or macOS to gain administrative access, steal local data, or escalate privileges on a local machine.",
+        "<b>Mobile Application Hacking</b> — finding flaws in iOS and Android applications.",
+        "<b>Social Engineering</b> — targets the human element rather than software.",
+        "<b>IoT Hacking</b> — tests smart devices like smart cameras, routers, or medical devices.",
+        "<b>Types by methodology:</b>",
+        "<b>Black Box Testing</b> — a blind, realistic attack from an external cybercriminal. The tester gets zero prior knowledge — often only a company name or an IP range.",
+        "<b>Grey Box Testing</b> — an attack from a limited insider, such as a rogue employee or contractor. The tester gets partial knowledge, such as standard user login credentials.",
+        "<b>White Box Testing</b> — a deep review by an insider with administrative access, like a developer. The tester gets full knowledge, including complete source code."
+      ],
+      exampleTitle:"Choosing the Right Box",
+      example:[
+        "Nimbus Health wants a security test. Given only the company name and a domain, testers work Black Box — knowing as little as an outsider would.",
+        "Given a normal user login as well, it becomes Grey Box. Given full source code and server access, it is White Box — thorough, but least like a real attacker."
+      ],
+      game:{type:"match", title:"Match the Testing Type",
+        desc:"Tap a testing type, then tap what it means.",
+        pairs:[
+          ["Black Box Testing","Zero prior knowledge — only a name or IP range"],
+          ["Grey Box Testing","Partial knowledge, such as standard user credentials"],
+          ["White Box Testing","Full knowledge including complete source code"],
+          ["Social Engineering","Targets the human element, not software"],
+          ["Cloud Hacking","Secures AWS, Azure, and Google Cloud"],
+        ]},
+      quiz:[
+        {q:"Which domain targets the human element rather than software?",opts:["Network Hacking","Cloud Hacking","Social Engineering","System Hacking"],a:2},
+        {q:"In black-box testing the tester receives:",opts:["Complete source code","Standard user credentials","Zero prior knowledge","Administrator access"],a:2},
+        {q:"Grey-box testing simulates an attack from:",opts:["A blind external criminal","A limited insider with partial knowledge","A developer with source code","An automated scanner"],a:1},
+        {q:"IoT hacking tests the security of:",opts:["Web APIs only","Smart devices like cameras, routers, medical devices","Email servers","Desktop printers only"],a:1},
+      ]
+    },
+    {
+      title:"Introduction to Red Teaming",
+      brief:"Red teams don't just find flaws — they act like real attackers to test detection and response.",
+      concept:[
+        "<b>Red teaming</b> is the authorized practice of simulating real-world cyberattacks to test how well an organization can prevent, detect, and respond to attackers. Red teams act like real attackers, with permission, to identify weaknesses in systems, networks, applications, and security controls.",
+        "<b>Works of red teamers:</b>",
+        "<b>1.</b> Simulate real-world attacks to test the organization's security defenses.",
+        "<b>2.</b> Identify weaknesses in systems, networks, applications, and user security.",
+        "<b>3.</b> Test whether security teams can detect, investigate, and respond to simulated attacks.",
+        "<b>4.</b> Attempt to gain access and move through systems within the agreed scope and rules.",
+        "<b>5.</b> Provide detailed findings and recommendations to improve security and reduce risks."
+      ],
+      exampleTitle:"The Debrief That Mattered",
+      example:[
+        "A red team quietly gained access to a client's file server over two weeks — and the client's defenders never noticed. That silence was the real finding.",
+        "The team reported not just the open door, but the missed detections, with recommendations for monitoring, alerting, and response drills."
+      ],
+      game:{type:"match", title:"Match the Red Team Task",
+        desc:"Tap a red team task, then tap its purpose.",
+        pairs:[
+          ["Simulate real-world attacks","Test whether defenses actually hold"],
+          ["Identify weaknesses","Find gaps in systems, networks, users"],
+          ["Test detection & response","See if defenders notice and react"],
+          ["Move within scope & rules","Gain access only as agreed"],
+          ["Report findings","Recommend improvements, reduce risk"],
+        ]},
+      quiz:[
+        {q:"Red teaming primarily tests:",opts:["Software licensing compliance","How well an organisation can prevent, detect and respond to attacks","Website performance","Backup restore times"],a:1},
+        {q:"Red teams operate:",opts:["Without permission, like criminals","With authorization and agreed scope and rules","Only on weekends","Only against competitors"],a:1},
+        {q:"A key red-team deliverable is:",opts:["A new firewall product","Detailed findings and recommendations to reduce risk","Faster servers","A marketing report"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Confirm the Testing Type",
+    intro:"A client engagement brief just arrived. Identify the testing type before scoping the work.",
+    terminal:[
+      {cmd:"cat engagement_brief.txt", out:"Tester has NOT been given:\n  - Source code\n  - Internal network diagrams\n  - User credentials\n\nTester HAS been given:\n  - Company name: Nimbus Health\n  - Public domain: nimbushealth.com"},
+      {cmd:"cat rules.txt", out:"Authorization: signed letter on file\nScope: nimbushealth.com public perimeter\nObjective: find exploitable gaps before criminals do"},
+    ],
+    question:"Which testing type does this brief describe — Black Box, Grey Box, or White Box?",
+    accept:["black box","blackbox","black"],
+    hint:"The tester received no prior knowledge of the infrastructure at all.",
+    successMsg:"Correct — Black Box Testing. The tester was given only a company name and a public domain, exactly as an external attacker would know.",
+    badge:"Red Team Rookie", xp:150
+  }
+},{
+  id:1, num:"02", day:1, title:"Ethical Hacking Methodology and Attack Lifecycle",
+  focus:"The 6-phase ethical hacking methodology and the 7-stage cyber attack lifecycle.",
+  lessons:[
+    {
+      title:"Phases of Ethical Hacking",
+      brief:"Ethical hacking follows a structured, authorized methodology: identify, validate, then help remediate.",
+      concept:[
+        "Ethical hacking follows a structured and authorized methodology designed to identify, validate, and help remediate security weaknesses before malicious attackers can exploit them.",
+        "<b>1. Planning</b> — defines the scope, objectives, target assets, testing methodology, authorization, and rules of engagement for the security assessment.",
+        "<b>2. Reconnaissance (Information Gathering)</b> — collects information about domains, IP ranges, technologies, services, employees, and publicly available information to understand the target's attack surface.",
+        "<b>3. Scanning and Enumeration</b> — identifies live hosts, open ports, running services, technologies, configurations, and potential vulnerabilities through appropriate scanning and enumeration techniques.",
+        "<b>4. Gaining Access (Exploitation)</b> — safely validates identified vulnerabilities by attempting controlled exploitation to assess their actual security impact.",
+        "<b>5. Post-Exploitation</b> — evaluates the potential impact of successful access, including privilege escalation, lateral movement, access to sensitive resources, and the effectiveness of security controls. Testing is performed only within the authorized scope.",
+        "<b>6. Reporting and Remediation</b> — documents verified vulnerabilities, attack paths, evidence, risk ratings, business impact, and prioritized recommendations for remediation. Retesting may be performed to verify that identified issues have been addressed."
+      ],
+      exampleTitle:"From Plan to Report",
+      example:[
+        "A team is engaged to test Nimbus Health's perimeter. They begin with Planning, confirming scope and a signed authorization before sending a single packet.",
+        "Recon and scanning reveal a weak service, which they exploit under control. Post-exploitation shows how far they could move, and Reporting turns it all into evidence with risk ratings and prioritised fixes."
+      ],
+      game:{type:"order", title:"Order the Methodology",
+        desc:"Tap the phases in the correct order.",
+        items:["Planning","Reconnaissance","Scanning & Enumeration","Gaining Access","Post-Exploitation","Reporting & Remediation"]},
+      quiz:[
+        {q:"Which phase defines scope, objectives and rules of engagement?",opts:["Planning","Reconnaissance","Exploitation","Reporting"],a:0},
+        {q:"What comes immediately after Scanning & Enumeration?",opts:["Reporting","Gaining Access","Planning","Remediation"],a:1},
+        {q:"Post-exploitation testing is performed:",opts:["Anywhere on the internet","Only within the authorized scope","After the report is delivered","Only on Linux systems"],a:1},
+        {q:"The Reporting phase documents all EXCEPT:",opts:["Verified vulnerabilities and evidence","Risk ratings and business impact","Prioritized remediation recommendations","The tester's personal opinions on staff"],a:3},
+      ]
+    },
+    {
+      title:"Cyber Attack Life Cycle",
+      brief:"Attackers follow stages too — learn their lifecycle so you can break it.",
+      concept:[
+        "The <b>Cyber Attack Life Cycle</b> is a framework that describes the typical stages an attacker may follow to plan, execute, and achieve objectives during a cyberattack.",
+        "<b>1. Reconnaissance</b> — the attacker gathers information about the target, such as domains, email addresses, technologies, network infrastructure, and potential vulnerabilities.",
+        "<b>2. Weaponization</b> — the attacker prepares a malicious payload by combining an exploit or malicious code with a delivery mechanism.",
+        "<b>3. Delivery</b> — the weaponized payload is delivered to the target through phishing emails, compromised websites, malicious downloads, or removable media.",
+        "<b>4. Exploitation</b> — the attacker exploits a vulnerability, security weakness, or user interaction to execute unauthorized code or actions on the target system.",
+        "<b>5. Installation</b> — malware, backdoors, or other mechanisms may be installed to establish continued access to the compromised system.",
+        "<b>6. Command and Control (C2)</b> — the compromised system establishes communication with attacker-controlled infrastructure, allowing the attacker to issue commands or manage the compromised environment.",
+        "<b>7. Actions on Objectives</b> — the attacker attempts to achieve their ultimate objective, such as stealing sensitive information, disrupting operations, deploying ransomware, or damaging systems."
+      ],
+      exampleTitle:"A Phishing Attack, Stage by Stage",
+      example:[
+        "An attacker researches Nimbus Health staff (Reconnaissance), builds a malicious invoice document (Weaponization), and emails it to finance (Delivery).",
+        "One click runs the macro (Exploitation), installs a backdoor (Installation) that phones home (C2), and weeks later customer records are stolen (Actions on Objectives)."
+      ],
+      game:{type:"order", title:"Order the Attack Lifecycle",
+        desc:"Tap the attacker stages in the correct order.",
+        items:["Reconnaissance","Weaponization","Delivery","Exploitation","Installation","Command and Control","Actions on Objectives"]},
+      quiz:[
+        {q:"In the Cyber Attack Life Cycle, 'Weaponization' means:",opts:["Sending the phishing email","Preparing a malicious payload by combining an exploit with a delivery mechanism","Installing malware on disk","Stealing data"],a:1},
+        {q:"Which stage establishes communication with attacker-controlled infrastructure?",opts:["Delivery","Installation","Command and Control (C2)","Reconnaissance"],a:2},
+        {q:"'Actions on Objectives' could include all EXCEPT:",opts:["Stealing sensitive information","Deploying ransomware","Disrupting operations","Patching the victim's servers"],a:3},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Identify the Missing Phase",
+    intro:"A trainee filled in a methodology checklist but left one phase blank. Find it.",
+    terminal:[
+      {cmd:"cat checklist.txt", out:"1. Planning\n2. __________\n3. Scanning & Enumeration\n4. Gaining Access\n5. Post-Exploitation\n6. Reporting & Remediation"},
+      {cmd:"cat notes.txt", out:"Missing phase notes: 'Collects information about domains,\nIP ranges, technologies, services, employees, and publicly\navailable information to understand the attack surface.'"},
+    ],
+    question:"Which phase is missing at step 2?",
+    accept:["reconnaissance","recon"],
+    hint:"It is the information-gathering step that maps the attack surface before any scanning begins.",
+    successMsg:"Correct — Reconnaissance. It sits between Planning and Scanning, gathering public information to understand the attack surface.",
+    badge:"Method Mapper", xp:150
+  }
+},{
+  id:2, num:"03", day:1, title:"Footprinting & Reconnaissance (Passive & Active)",
+  focus:"Footprinting vs reconnaissance, why each matters, and every passive and active technique.",
+  lessons:[
+    {
+      title:"Footprinting: Mapping the Target",
+      brief:"Footprinting builds the detailed map of the target from everything recon uncovers.",
+      concept:[
+        "<b>Footprinting</b> is the process of building a detailed profile or map of the target using the information gathered during reconnaissance. It focuses on identifying specific details such as domains, subdomains, IP addresses, DNS records, network ranges, running services, and other technical information about the target's infrastructure.",
+        "<b>Importance of footprinting:</b>",
+        "<b>1.</b> Maps the target's digital presence by identifying domains, subdomains, IP ranges, services, and network infrastructure.",
+        "<b>2.</b> Identifies the attack surface by showing publicly exposed systems, services, and other accessible resources.",
+        "<b>3.</b> Provides a clearer picture of the target infrastructure and helps security professionals understand how different systems are connected.",
+        "<b>4.</b> Helps identify exposed or outdated information that could create security risks for the organization.",
+        "<b>1. Passive footprinting</b> — builds a profile using publicly available information without directly interacting with the target's systems: collecting domain names and subdomains; identifying public IP addresses and IP ranges; gathering DNS and mail-server information; finding employee names, roles, and public contact information; reviewing historical information and publicly available documents.",
+        "<b>2. Active footprinting</b> — directly interacts with the target's systems or network to gather detailed technical information: identifying live hosts and reachable systems; performing port and service scanning; identifying operating systems and software versions; gathering service banner information; using tools such as Nmap to map the target's network infrastructure."
+      ],
+      exampleTitle:"The Map Before the Mission",
+      example:[
+        "Before touching Nimbus Health's network, a team builds a footprint: domains, subdomains, IP ranges, DNS and mail records, plus employee names from public sources — all passive and invisible.",
+        "Only then, with authorization, do they go active: live-host discovery, port scans, service banners and Nmap mapping to complete the picture."
+      ],
+      game:{type:"sort", title:"Passive or Active Footprinting?",
+        desc:"Tap a technique, then tap its footprinting type.",
+        buckets:["Passive Footprinting","Active Footprinting"],
+        items:[
+          ["Collecting domain names and subdomains","Passive Footprinting"],
+          ["Identifying public IP addresses and ranges","Passive Footprinting"],
+          ["Gathering DNS and mail-server info","Passive Footprinting"],
+          ["Finding employee names and roles","Passive Footprinting"],
+          ["Reviewing historical public documents","Passive Footprinting"],
+          ["Identifying live hosts","Active Footprinting"],
+          ["Port and service scanning","Active Footprinting"],
+          ["Gathering service banners","Active Footprinting"],
+        ]},
+      quiz:[
+        {q:"Footprinting is best defined as:",opts:["Exploiting a web application","Building a detailed profile of the target's infrastructure","Writing a report","Cracking passwords"],a:1},
+        {q:"Which is a PASSIVE footprinting activity?",opts:["Port scanning with Nmap","Gathering DNS and mail-server information","Banner grabbing","Live-host discovery"],a:1},
+        {q:"One importance of footprinting is that it:",opts:["Speeds up downloads","Identifies the attack surface of exposed systems","Encrypts DNS queries","Removes the need for scanning"],a:1},
+        {q:"Active footprinting differs because it:",opts:["Costs more money","Directly interacts with the target's systems","Always fails","Requires no authorization"],a:1},
+      ]
+    },
+    {
+      title:"Reconnaissance: Passive & Active",
+      brief:"Recon is the information-gathering phase — learn its purpose and every technique in both flavors.",
+      concept:[
+        "<b>Reconnaissance</b> is the information-gathering phase of ethical hacking where a security professional collects information about the target to understand its overall environment, assets, technologies, and potential attack surface — including domains, employees, technologies, public systems, and other publicly available details.",
+        "<b>Importance of reconnaissance:</b>",
+        "<b>1.</b> Collects initial information about the target such as domains, IP addresses, employees, technologies, and public assets.",
+        "<b>2.</b> Helps understand the target environment — its systems, technologies, and online presence.",
+        "<b>3.</b> Helps identify potential areas for further security testing based on gathered information.",
+        "<b>4.</b> Provides useful information for planning a security assessment and determining which areas should be examined further.",
+        "<b>1. Passive reconnaissance</b> — collects information without directly interacting with target systems: searching with search engines; checking social media profiles and public information; gathering info from public websites and online directories; looking up domain registration and DNS information; reviewing public documents, job postings, and technology information.",
+        "<b>2. Active reconnaissance</b> — directly interacts with the target's systems or network: discovering live hosts and systems; scanning for open ports; identifying running services and software versions; performing DNS queries against the target; using tools such as Nmap to gather network information."
+      ],
+      exampleTitle:"Quiet First, Then Loud",
+      example:[
+        "A team mapping Nimbus Health begins passively — search engines, social media, WHOIS, archived pages and job postings — all invisible to the target.",
+        "Once authorization is confirmed, they switch to active methods: live-host sweeps, port scans and Nmap probing. Now firewalls can see them — which is exactly why the passive work came first."
+      ],
+      game:{type:"match", title:"Match the Recon Technique",
+        desc:"Tap a technique, then tap whether it is passive or active.",
+        pairs:[
+          ["Search-engine queries","Passive reconnaissance"],
+          ["Social media profiling","Passive reconnaissance"],
+          ["Reviewing job postings","Passive reconnaissance"],
+          ["Scanning for open ports","Active reconnaissance"],
+          ["Discovering live hosts","Active reconnaissance"],
+          ["DNS queries against the target","Active reconnaissance"],
+        ]},
+      quiz:[
+        {q:"Passive reconnaissance is best defined as:",opts:["Collecting info without touching the target's systems","Fast port scanning","Exploiting a service","DNS zone transfer"],a:0},
+        {q:"Which of these is an ACTIVE reconnaissance activity?",opts:["Reviewing job postings","Looking up DNS records publicly","Scanning open ports with Nmap","Reading archived snapshots"],a:2},
+        {q:"Reconnaissance helps planning because it:",opts:["Skips authorization","Determines which areas should be examined further","Guarantees no detection","Replaces the final report"],a:1},
+        {q:"The main risk of active recon is:",opts:["It costs more","It can be detected by firewalls and IDS/IPS","It always fails","It requires root access"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Passive or Active?",
+    intro:"A junior analyst listed several recon tasks. Sort out the ones that touch the target.",
+    terminal:[
+      {cmd:"cat recon_tasks.txt", out:"1. Search Google for 'site:nimbushealth.com'\n2. dig MX nimbushealth.com\n3. nmap -sV 203.0.113.0/24\n4. Check Wayback Machine snapshots\n5. curl -I https://nimbushealth.com\n6. WHOIS lookup on nimbushealth.com"},
+      {cmd:"cat policy.txt", out:"Passive work is always allowed.\nActive work requires written authorization.\nAll tasks below must be classified first."},
+    ],
+    question:"Which task numbers are ACTIVE (they send traffic directly to the target)?",
+    accept:["3 and 5","3, 5","3 5","3&5"],
+    hint:"Count only the tasks that generate packets reaching the target's own systems.",
+    successMsg:"Correct — tasks 3 and 5. The Nmap scan and the direct curl request both contact the target, making them active. The rest are passive.",
+    badge:"Recon Analyst", xp:150
+  }
+},{
+  id:3, num:"04", day:1, title:"Domain, DNS, IP & Subdomain Enumeration",
+  focus:"Domains, DNS and IPs, URL anatomy, subdomain enumeration, and the tools that automate it.",
+  lessons:[
+    {
+      title:"Domains, DNS & IP Addresses",
+      brief:"Names for humans, numbers for machines, and the phonebook that connects them.",
+      concept:[
+        "<b>Domain</b> — the human-readable name of a website (like google.com) that is easy for people to type and remember.",
+        "<b>IP Address</b> — a unique string of numbers (like 172.217.14.206) that identifies a specific computer or server on a network.",
+        "<b>DNS (Domain Name System)</b> — the phonebook of the internet that translates the text-based domain name into a numerical IP address so your browser can find the right server.",
+        "<b>How they work together:</b>",
+        "<b>1. You type the name</b> — you enter a domain like example.com into your web browser.",
+        "<b>2. The lookup</b> — your computer asks DNS to find the numerical address for that name.",
+        "<b>3. The connection</b> — DNS matches example.com to its numerical IP address (e.g., 192.0.2.1) and gives it back to your browser.",
+        "<b>4. The load</b> — your browser uses that IP address to connect directly to the host server and load the web page."
+      ],
+      exampleTitle:"Typing a Name, Reaching a Number",
+      example:[
+        "You type example.com and hit enter. Behind the scenes your computer asks DNS, receives 192.0.2.1, and connects to that server — all in milliseconds.",
+        "An enumerator reverses this flow: from one known domain, they pull DNS records to reveal every IP, mail server, and subdomain tied to the target."
+      ],
+      game:{type:"match", title:"Match the DNS Term",
+        desc:"Tap a term, then tap what it means.",
+        pairs:[
+          ["Domain","Human-readable website name"],
+          ["IP address","Unique numbers identifying a server"],
+          ["DNS","Phonebook translating names to IPs"],
+          ["The lookup step","Computer asks DNS for the address"],
+          ["The load step","Browser connects via IP, loads page"],
+        ]},
+      quiz:[
+        {q:"DNS's primary job is to:",opts:["Encrypt traffic","Translate domain names into IP addresses","Scan ports","Store cookies"],a:1},
+        {q:"An IP address is best described as:",opts:["A website's name","A unique numeric identifier for a machine on a network","A type of malware","A firewall rule"],a:1},
+        {q:"After DNS returns the IP address, the browser:",opts:["Encrypts the domain","Connects directly to the host server and loads the page","Scans the server's ports","Asks the user for a password"],a:1},
+      ]
+    },
+    {
+      title:"Anatomy of a URL",
+      brief:"Every URL is six labeled parts. Learn to read https://news.ycombinator.com?id=41500000 like a map.",
+      concept:[
+        "URL under study: <b>https://news.ycombinator.com?id=41500000</b>",
+        "<b>Protocol (https://)</b> — the secure connection rule that encrypts your traffic so your data stays private.",
+        "<b>Subdomain (news.)</b> — the specific section of the website dedicated to the discussion forum and headlines.",
+        "<b>Domain Name (ycombinator)</b> — the unique brand name identifying the company hosting the site.",
+        "<b>Top-Level Domain (.com)</b> — the standard extension indicating that this is a commercial or business web entity.",
+        "<b>Path (implicit or none here)</b> — the root location, as this specific site serves files straight from the main directory.",
+        "<b>Query Parameter (?id=41500000)</b> — the specific instructions telling the site exactly which forum post or article to load."
+      ],
+      exampleTitle:"Why Each Part Matters",
+      example:[
+        "The protocol tells you traffic is encrypted; the subdomain tells you which section serves the content; the query parameter tells you user input reaches the application — a possible test point.",
+        "Enumerators collect subdomains precisely because each one (news., api., dev.) can be a separate application with separate flaws."
+      ],
+      game:{type:"match", title:"Match the URL Part",
+        desc:"Tap a URL component, then tap what it means.",
+        pairs:[
+          ["Protocol (https://)","Secure connection rule that encrypts traffic"],
+          ["Subdomain (news.)","Specific section of the website"],
+          ["Domain Name (ycombinator)","Unique brand name of the company"],
+          ["Top-Level Domain (.com)","Extension indicating a commercial entity"],
+          ["Path (none here)","Root location serving files directly"],
+          ["Query Parameter (?id=41500000)","Tells the site which post to load"],
+        ]},
+      quiz:[
+        {q:"In https://shop.example.com, 'shop' is the:",opts:["Domain name","Top-level domain","Subdomain","Protocol"],a:2},
+        {q:"The query parameter in a URL:",opts:["Encrypts the connection","Gives the site specific instructions like which post to load","Names the company","Chooses the server's IP"],a:1},
+        {q:"'.com' in a URL is the:",opts:["Subdomain","Protocol","Top-level domain","Query parameter"],a:2},
+      ]
+    },
+    {
+      title:"Subdomain Enumeration",
+      brief:"One domain can hide dozens of subdomains — forgotten ones are often the weakest doors.",
+      concept:[
+        "<b>Subdomain enumeration</b> is the process of identifying all subdomains for a given domain. This can identify potential targets for an attack. It also helps to broaden the attack surface, find hidden applications, and forgotten subdomains.",
+        "<b>Importance of subdomain enumeration:</b>",
+        "<b>1. Identify vulnerable attack targets</b> — uncover forgotten, poorly protected, or legacy subdomains that act as weaker entry points into an organization's network.",
+        "<b>2. Gain organizational insights</b> — map corporate structure, service offerings, and asset footprints during penetration testing or reconnaissance.",
+        "<b>3. Expose DNS misconfigurations</b> — detect flawed setup records (like dangling DNS entries) that inadvertently leak internal IP addresses or open the door to subdomain takeovers."
+      ],
+      exampleTitle:"The Forgotten dev. Server",
+      example:[
+        "Enumeration of nimbushealth.com reveals portal., api., mail. — and dev., a staging copy nobody patched in a year.",
+        "That forgotten subdomain, not the hardened main site, becomes the entry point. This is why enumeration matters."
+      ],
+      game:{type:"match", title:"Match the Enumeration Benefit",
+        desc:"Tap a benefit, then tap what it gives you.",
+        pairs:[
+          ["Find forgotten subdomains","Weaker entry points into the network"],
+          ["Map the organization","Structure, services, asset footprints"],
+          ["Expose misconfigurations","Dangling DNS, leaked IPs, takeovers"],
+          ["Broaden attack surface","Hidden apps beyond the main site"],
+        ]},
+      quiz:[
+        {q:"Subdomain enumeration is valuable mainly because it:",opts:["Speeds up downloads","Reveals forgotten or vulnerable hidden entry points","Encrypts DNS queries","Removes the need for scanning"],a:1},
+        {q:"A dangling DNS entry can lead to:",opts:["Faster page loads","Subdomain takeover by an attacker","Stronger encryption","Free domain renewal"],a:1},
+        {q:"Mapping subdomains also gives:",opts:["Payroll data","Organizational insights into structure and services","Encryption keys","Employee passwords"],a:1},
+      ]
+    },
+    {
+      title:"Enumeration Tools: subfinder & gobuster",
+      brief:"Learn the exact commands — and every flag — used to enumerate subdomains and hidden paths.",
+      concept:[
+        "<b>subfinder -d example.com -o results.txt</b>",
+        "<b>subfinder</b> — launches the Subfinder tool.",
+        "<b>-d example.com</b> — specifies the target domain you want to map.",
+        "<b>-o results.txt</b> — saves the clean list of found subdomains to an output text file.",
+        "<b>gobuster dns -d example.com -w /path/to/wordlist.txt -o results.txt</b>",
+        "<b>dns</b> — tells Gobuster to look for subdomains.",
+        "<b>-d example.com</b> — specifies the target domain.",
+        "<b>-w /path/to/wordlist.txt</b> — specifies the wordlist of potential subdomain names to test.",
+        "<b>-o results.txt</b> — saves the discovered subdomains to a text file.",
+        "<b>gobuster dir -u https://example.com -w /path/to/wordlist.txt -o results.txt</b>",
+        "<b>dir</b> — tells Gobuster to look for hidden folders and files.",
+        "<b>-u https://example.com</b> — specifies the target website URL."
+      ],
+      exampleTitle:"Two Tools, One Target",
+      example:[
+        "First pass: subfinder -d nimbushealth.com -o results.txt quietly collects subdomains from public sources.",
+        "Second pass: gobuster dns brute-forces more names from a wordlist; then gobuster dir hunts hidden folders on the site itself."
+      ],
+      game:{type:"match", title:"Match the Flag",
+        desc:"Tap a flag or mode, then tap what it does.",
+        pairs:[
+          ["-d example.com","Specifies the target domain"],
+          ["-o results.txt","Saves output to a text file"],
+          ["dns (gobuster)","Look for subdomains"],
+          ["dir (gobuster)","Look for hidden folders and files"],
+          ["-w wordlist.txt","Wordlist of names to test"],
+          ["-u https://example.com","Specifies the target website URL"],
+        ]},
+      quiz:[
+        {q:"In 'subfinder -d example.com -o results.txt', -o means:",opts:["Open the browser","Save output to results.txt","Overwrite the target","Use online mode"],a:1},
+        {q:"'gobuster dns' is used to:",opts:["Look for hidden folders","Look for subdomains","Download the site","Crack passwords"],a:1},
+        {q:"The -w flag provides:",opts:["The target URL","A wordlist of names to test","The output file","The scan speed"],a:1},
+        {q:"'gobuster dir -u https://example.com' hunts for:",opts:["Subdomains","Hidden folders and files on the site","DNS records","Email addresses"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Enumerate the Subdomains",
+    intro:"A subfinder run against nimbushealth.com just finished. Interpret the output.",
+    terminal:[
+      {cmd:"subfinder -d nimbushealth.com -o results.txt", out:"www.nimbushealth.com\nportal.nimbushealth.com\napi.nimbushealth.com\ndev.nimbushealth.com\ndemo.nimbushealth.com\nmail.nimbushealth.com"},
+      {cmd:"cat targets.txt", out:"All hosts must be triaged before scanning.\nFlag the most likely forgotten or non-production asset."},
+    ],
+    question:"Which subdomain is most likely a forgotten or test environment worth investigating first?",
+    accept:["dev","demo"],
+    hint:"Look for a subdomain name that suggests development or demonstration rather than production.",
+    successMsg:"Correct — dev.nimbushealth.com (and demo) strongly suggest a non-production environment that is often less protected — a classic forgotten asset.",
+    badge:"Subdomain Sleuth", xp:150
+  }
+},{
+  id:4, num:"05", day:1, title:"Technology & Web Application Fingerprinting",
+  focus:"Passive vs active fingerprinting, the five signals to read, why it matters, and the tools.",
+  lessons:[
+    {
+      title:"Passive vs Active Fingerprinting",
+      brief:"Once you can reach a target, ask: what exactly is running behind it — quietly or loudly?",
+      concept:[
+        "<b>Web Application Fingerprinting</b> — the process of gathering detailed information about a target website's underlying software, frameworks, operating systems, and hardware architectures.",
+        "<b>Passive Fingerprinting</b> — information gathering that relies on analyzing publicly available data and normal traffic without sending aggressive requests to the target (e.g., inspecting source code, public cookies, or standard headers).",
+        "<b>Active Fingerprinting</b> — information gathering that involves sending specifically crafted packets or requests to the target to observe how it responds (e.g., forcing error pages or probing hidden directories).",
+        "<b>How they work together:</b>",
+        "<b>The Request</b> — you or a scanner request a webpage from the target server.",
+        "<b>The Response</b> — the server sends back HTML code, HTTP headers, cookies, and scripts.",
+        "<b>The Analysis</b> — fingerprinting tools parse these components looking for distinct signatures, such as unique code comments, specific folder structures, or header values.",
+        "<b>The Identification</b> — the tool matches these signatures against a database to reveal exactly what software versions and operating systems the site is running."
+      ],
+      exampleTitle:"Two Headers, Two Answers",
+      example:[
+        "A curl -I request to a target returns 'Server: nginx/1.18.0' and 'X-Powered-By: PHP/7.4'. Those headers alone name the web server and the backend language.",
+        "Reading the page source reveals a WordPress generator tag, confirming the CMS. A blank URL becomes a mapped technology stack — ready for version and CVE checks."
+      ],
+      game:{type:"sort", title:"Passive or Active Fingerprinting?",
+        desc:"Tap a technique, then tap its type.",
+        buckets:["Passive","Active"],
+        items:[
+          ["Inspecting source code","Passive"],
+          ["Reading public cookies","Passive"],
+          ["Checking standard headers","Passive"],
+          ["Analyzing normal traffic","Passive"],
+          ["Forcing error pages","Active"],
+          ["Probing hidden directories","Active"],
+          ["Sending crafted packets","Active"],
+        ]},
+      quiz:[
+        {q:"Which of these is a PASSIVE fingerprinting technique?",opts:["Forcing error pages","Inspecting publicly visible response headers","Probing hidden directories","Sending crafted packets"],a:1},
+        {q:"Active fingerprinting observes:",opts:["Public cookies only","How the target responds to crafted requests","Search engine caches","Nothing — it is invisible"],a:1},
+        {q:"The final fingerprinting step is:",opts:["Sending the request","Matching signatures against a database to identify software","Deleting cookies","Closing the browser"],a:1},
+      ]
+    },
+    {
+      title:"What We Look For: Five Signals",
+      brief:"Headers, source code, cookies, paths, extensions — the five places software identities leak.",
+      concept:[
+        "Analyzing the specific components of a web response to extract technical identities.",
+        "<b>HTTP Response Headers</b> — metadata sent by the server (like Server: Apache/2.4.41 or X-Powered-By: PHP/7.4) that directly names the software.",
+        "<b>HTML Source Code & Comments</b> — unique code structure, meta tags (like meta name=\"generator\" content=\"WordPress\"), or developer comments left in the code.",
+        "<b>Cookies</b> — specific names assigned by session handlers (like PHPSESSID for PHP or jsessionid for Java) that expose the backend language.",
+        "<b>File Structure & Asset Paths</b> — distinct folder names used by specific systems (such as /wp-content/ for WordPress or /sites/default/ for Drupal).",
+        "<b>URL File Extensions</b> — extensions visible in paths (like .php, .asp, or .jsp) that immediately tip off the server's programming environment."
+      ],
+      exampleTitle:"Reading the Response",
+      example:[
+        "Headers say Apache/2.4.41 and PHP/7.4; a PHPSESSID cookie confirms PHP; /wp-content/ paths confirm WordPress; .php URLs confirm the environment.",
+        "Five signals, one conclusion — and each version number becomes a CVE lookup."
+      ],
+      game:{type:"match", title:"Decode the Fingerprint",
+        desc:"Tap a signal, then tap what it reveals.",
+        pairs:[
+          ["Server: Apache/2.4.41 header","Web server software and version"],
+          ["X-Powered-By: PHP/7.4 header","Backend scripting language"],
+          ["Cookie named PHPSESSID","PHP session handling"],
+          ["/wp-content/ path in source","WordPress CMS in use"],
+          ["URL ending in .jsp","Java-based server-side page"],
+        ]},
+      quiz:[
+        {q:"A cookie named jsessionid most strongly indicates:",opts:["PHP","Java","Python","nginx"],a:1},
+        {q:"The header 'X-Powered-By: PHP/7.4' reveals:",opts:["The server's IP address","The backend language and version","The database password","The admin username"],a:1},
+        {q:"'/sites/default/' in asset paths suggests:",opts:["WordPress","Drupal","Django","Ruby on Rails"],a:1},
+        {q:"A URL ending in .asp tips off:",opts:["The server's programming environment","The visitor's browser","The DNS provider","The SSL issuer"],a:0},
+      ]
+    },
+    {
+      title:"Why Fingerprinting Matters",
+      brief:"Fingerprinting turns a blank URL into a shortlist of known flaws.",
+      concept:[
+        "Web application fingerprinting is an essential phase of reconnaissance. It allows security professionals — and attackers — to understand the exact composition of a target environment to identify known flaws.",
+        "<b>1. Identify known vulnerabilities</b> — pinpoint the exact software version running so you can cross-reference it with CVE databases for unpatched vulnerabilities.",
+        "<b>2. Map the attack surface</b> — understand the specific languages and frameworks in use to narrow down exploit strategies and avoid wasting time on irrelevant payloads.",
+        "<b>3. Detect hidden security flaws</b> — uncover misconfigured development setups, old legacy frameworks, or forgotten plugins left active on the server."
+      ],
+      exampleTitle:"From Version to CVE",
+      example:[
+        "Fingerprinting pins portal.nimbushealth.com to WordPress 5.8 on PHP 7.4. A CVE database search for those exact versions returns known, unpatched flaws within seconds.",
+        "Without the fingerprint, the team would be guessing payloads blindly. With it, every test is targeted."
+      ],
+      game:{type:"match", title:"Match the Fingerprinting Payoff",
+        desc:"Tap a payoff, then tap what it delivers.",
+        pairs:[
+          ["Exact version identified","CVE cross-reference for unpatched flaws"],
+          ["Languages mapped","Narrowed exploit strategy, no wasted payloads"],
+          ["Legacy setup spotted","Hidden flaws: dev configs, old plugins"],
+          ["Composition understood","Know the target before testing it"],
+        ]},
+      quiz:[
+        {q:"Why fingerprint a target?",opts:["To identify exact versions so known CVEs can be checked","To slow the server down","To change the site's content","To bypass encryption"],a:0},
+        {q:"Knowing the framework in use helps attackers:",opts:["Write better reports","Avoid wasting time on irrelevant payloads","Encrypt traffic","Delete logs"],a:1},
+        {q:"Fingerprinting can uncover:",opts:["Strong passwords","Forgotten plugins left active on the server","The CEO's email","Firewall invoices"],a:1},
+      ]
+    },
+    {
+      title:"Fingerprinting Tools",
+      brief:"whatweb, wappalyzer-cli, and curl — the exact commands and every flag.",
+      concept:[
+        "<b>whatweb https://example.com</b>",
+        "<b>whatweb</b> — launches the WhatWeb reconnaissance tool.",
+        "<b>https://example.com</b> — specifies the target URL to scan for CMS, platforms, and server types.",
+        "<b>wappalyzer-cli https://example.com</b>",
+        "<b>wappalyzer-cli</b> — launches the command-line utility for Wappalyzer.",
+        "<b>https://example.com</b> — specifies the target website to extract technology stack profiles.",
+        "<b>curl -I https://example.com</b>",
+        "<b>curl</b> — invokes the command-line data transfer tool.",
+        "<b>-I</b> — tells curl to fetch the HTTP response headers only, ignoring the actual page content."
+      ],
+      exampleTitle:"Three Commands, One Profile",
+      example:[
+        "whatweb https://portal.nimbushealth.com instantly lists CMS, server, and platform. wappalyzer-cli extracts the full technology stack profile.",
+        "curl -I grabs just the headers — Server, X-Powered-By, cookies — the fastest fingerprint of all."
+      ],
+      game:{type:"match", title:"Match the Tool & Flag",
+        desc:"Tap a tool or flag, then tap what it does.",
+        pairs:[
+          ["whatweb","Recon tool scanning for CMS and platforms"],
+          ["wappalyzer-cli","Extracts technology stack profiles"],
+          ["curl","Command-line data transfer tool"],
+          ["-I (curl)","Fetch HTTP response headers only"],
+          ["target URL argument","Specifies the website to fingerprint"],
+        ]},
+      quiz:[
+        {q:"'curl -I https://example.com' returns:",opts:["The full page content","HTTP response headers only","The site's source images","DNS records"],a:1},
+        {q:"WhatWeb is used to scan for:",opts:["Open ports","CMS, platforms, and server types","Passwords","Email addresses"],a:1},
+        {q:"wappalyzer-cli extracts:",opts:["Technology stack profiles","Firewall rules","User credentials","SSL certificates"],a:0},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Fingerprint the Stack",
+    intro:"Raw responses from the target web application are in. Identify what is running.",
+    terminal:[
+      {cmd:"curl -I https://portal.nimbushealth.com", out:"HTTP/2 200\nserver: nginx/1.18.0\nx-powered-by: PHP/7.4.3\nset-cookie: PHPSESSID=8f2a1c...; path=/\ncontent-type: text/html; charset=UTF-8"},
+      {cmd:"grep generator page.html", out:"<meta name=\"generator\" content=\"WordPress 5.8\" />"},
+    ],
+    question:"Which backend language does the portal use?",
+    accept:["php"],
+    hint:"Look at the x-powered-by header and the session cookie name.",
+    successMsg:"Correct — PHP (specifically 7.4.3), revealed by both the X-Powered-By header and the PHPSESSID cookie.",
+    badge:"Fingerprint Hunter", xp:150
+  }
+},{
+  id:5, num:"06", day:1, title:"Network & Service Enumeration using Nmap",
+  focus:"Nmap basics and port states, scan syntax, why enumeration matters, and core Nmap commands.",
+  lessons:[
+    {
+      title:"Enumeration Basics & Port States",
+      brief:"You cannot attack what you cannot see — enumeration turns a network range into living services.",
+      concept:[
+        "<b>Network Enumeration</b> — the process of discovering active hosts, open ports, and available services within a target network to map its structural layout.",
+        "<b>Service Enumeration</b> — the process of identifying the exact applications, protocols, and software versions running on discovered open ports.",
+        "<b>Nmap (Network Mapper)</b> — an open-source security tool used for network discovery, service fingerprinting, and vulnerability detection.",
+        "<b>Port States</b> — the status of a communication gateway on a device, categorized by Nmap to indicate availability:",
+        "<b>Open</b> — an application is actively accepting connections on this port.",
+        "<b>Closed</b> — the port is accessible, but no application is currently listening on it.",
+        "<b>Filtered</b> — a firewall, filter, or network obstacle is blocking Nmap from reaching the port to determine its state.",
+        "<b>How they work together:</b>",
+        "<b>Host Discovery</b> — Nmap sends initial packets (like ping requests) to find out which machines are powered on and connected to the network.",
+        "<b>Port Scanning</b> — for each active host, Nmap probes specific ports to check if they are open, closed, or filtered.",
+        "<b>Service Interrogation</b> — Nmap interacts directly with open ports by sending specific application-layer probes and listening for response data.",
+        "<b>Banner Grabbing</b> — the tool reads the welcome messages (banners) returned by the service to extract the exact application name and version details.",
+        "<b>OS Detection</b> — Nmap analyzes subtle differences in how the target operating system responds to network packets to guess the OS version."
+      ],
+      exampleTitle:"Reading an Nmap Report",
+      example:[
+        "nmap -sV -p 22,80,443 203.0.113.10 reveals: port 22 open (OpenSSH), port 80 open (nginx), port 443 open (nginx) — a web server with remote administration.",
+        "Host discovery found the machine alive, port scanning classified each port, interrogation and banner grabs named the versions, and OS detection guessed the platform."
+      ],
+      game:{type:"sort", title:"Open, Closed or Filtered?",
+        desc:"Tap a scan result, then tap its port state.",
+        buckets:["Open","Closed","Filtered"],
+        items:[
+          ["57/tcp open ssh","Open"],
+          ["443/tcp open https","Open"],
+          ["21/tcp closed ftp","Closed"],
+          ["8080/tcp filtered n-proxy","Filtered"],
+          ["3306/tcp open mysql","Open"],
+          ["25/tcp closed smtp","Closed"],
+        ]},
+      quiz:[
+        {q:"Which port state means a firewall or filter blocked the scan?",opts:["Open","Closed","Filtered","Refused"],a:2},
+        {q:"Banner grabbing extracts:",opts:["Firewall rules","The exact application name and version from welcome messages","Passwords","DNS records"],a:1},
+        {q:"Host discovery finds:",opts:["Open ports","Which machines are powered on and connected","Software versions","Vulnerabilities"],a:1},
+        {q:"Service enumeration identifies:",opts:["The exact applications, protocols and versions on open ports","Only IP addresses","Only domain names","The tester's location"],a:0},
+      ]
+    },
+    {
+      title:"Understanding Nmap Scan Syntax",
+      brief:"Every Nmap command is built from six blocks: target, technique, version, ports, timing, output.",
+      concept:[
+        "Analyzing the core components of an Nmap command to control scan behavior, speed, and output.",
+        "<b>Target Specification</b> — the destination IP address (e.g., 192.168.1.1), domain name, or entire network range (e.g., 192.168.1.0/24) you want to scan.",
+        "<b>Scan Technique Flags</b> — instructions determining how Nmap handles connection handshakes (like -sS for Stealth/SYN scans or -sT for full TCP Connect scans).",
+        "<b>Service & Version Flags</b> — toggles dedicated to interrogating services, such as -sV, which forces Nmap to probe open ports to determine service and version info.",
+        "<b>Port Selection Flags</b> — controls which ports are tested, using -p followed by specific numbers (like -p 80,443) or -p- to scan all 65,335 possible ports.",
+        "<b>Timing Templates</b> — performance modifiers ranging from -T0 (paranoid/slow) to -T5 (insanely fast) that adjust packet speed to bypass network congestion or detection.",
+        "<b>Output Formats</b> — directives that save your results into standard files (-oN) or easily searchable formats (-oG for grepable output)."
+      ],
+      exampleTitle:"Building a Command",
+      example:[
+        "nmap -sS -sV -O -p 22,80,443 -T4 -oN scan.txt 192.168.1.50 reads as: stealth SYN technique, version detection, OS detection, three ports, aggressive timing, normal output to a file, one target.",
+        "Change one block and the scan behaves differently — syntax is control."
+      ],
+      game:{type:"match", title:"Match the Syntax Block",
+        desc:"Tap a syntax component, then tap what it controls.",
+        pairs:[
+          ["Target specification","IP, domain, or range to scan"],
+          ["Scan technique (-sS/-sT)","How connection handshakes are handled"],
+          ["Service flag (-sV)","Probe open ports for versions"],
+          ["Port selection (-p/-p-)","Which ports get tested"],
+          ["Timing (-T0 to -T5)","Packet speed, stealth vs haste"],
+          ["Output (-oN/-oG)","Save results to files"],
+        ]},
+      quiz:[
+        {q:"Which Nmap flag performs service and version detection?",opts:["-p-","-sV","-sT","-O"],a:1},
+        {q:"'-p-' tells Nmap to scan:",opts:["Only port 80","All 65,335 possible ports","No ports","Only UDP ports"],a:1},
+        {q:"-T0 timing is best when you need to:",opts:["Scan as fast as possible","Stay paranoid/slow to avoid detection","Scan IPv6 only","Skip host discovery"],a:1},
+        {q:"-oG output format is useful because it is:",opts:["Encrypted","Easily searchable (grepable)","Only for Windows","A graphical report"],a:1},
+      ]
+    },
+    {
+      title:"Why Enumeration Matters",
+      brief:"Enumeration is the bridge between finding a target and launching an exploit.",
+      concept:[
+        "Network and service enumeration is the bridge between finding a target and launching an exploit. It helps security teams catalog corporate assets and seal exposed network entries before they are abused.",
+        "<b>1. Identify exploit pathways</b> — pinpoint the exact service version (e.g., OpenSSH 7.2p2) running on a port so you can check for public exploits or known security flaws.",
+        "<b>2. Expose unauthorized entry points</b> — locate accidental or rogue services running on the network that should not be exposed to the public.",
+        "<b>3. Map network layouts</b> — discover live devices, routers, printers, and internal servers to build a visual architecture of the organization's network footprint.",
+        "<b>4. Pinpoint legacy hardware</b> — identify unmaintained or outdated operating systems and firmware that are prone to critical infrastructure exploits."
+      ],
+      exampleTitle:"The Rogue Service",
+      example:[
+        "Enumeration of a client range finds MySQL on a host nobody owns — a forgotten database, world-readable, with a known CVE for its exact version.",
+        "Catalogued, reported, and sealed before attackers find it. That is the whole point of the bridge."
+      ],
+      game:{type:"match", title:"Match the Enumeration Payoff",
+        desc:"Tap a payoff, then tap what it delivers.",
+        pairs:[
+          ["Exact service version","Check for public exploits and flaws"],
+          ["Rogue service found","Seal what should never be exposed"],
+          ["Live devices mapped","Visual architecture of the footprint"],
+          ["Legacy OS spotted","Flag infra prone to critical exploits"],
+        ]},
+      quiz:[
+        {q:"Enumeration helps identify exploit pathways by:",opts:["Guessing passwords","Pinpointing exact service versions to check for known flaws","Encrypting traffic","Deleting old servers"],a:1},
+        {q:"A rogue service is:",opts:["A fast web server","An accidental or unauthorized service exposed on the network","A patched application","A backup system"],a:1},
+        {q:"Mapping live devices, routers and printers builds:",opts:["A password list","A visual architecture of the network footprint","A firewall","A DNS zone"],a:1},
+      ]
+    },
+    {
+      title:"Core Nmap Commands",
+      brief:"Three commands that cover host discovery, deep interrogation, and vulnerability checks.",
+      concept:[
+        "<b>nmap -sn 192.168.1.0/24</b>",
+        "<b>nmap</b> — launches the Network Mapper tool.",
+        "<b>-sn</b> — disables port scanning, performing a ping scan purely for host discovery to see which machines are online.",
+        "<b>192.168.1.0/24</b> — specifies the entire local subnet range to scan.",
+        "<b>nmap -sS -sV -O 192.168.1.50</b>",
+        "<b>-sS</b> — conducts a TCP SYN scan (Stealth Scan) by half-opening connections to avoid logging.",
+        "<b>-sV</b> — enables Service Version Detection, actively probing open ports to determine service names and exact version details.",
+        "<b>-O</b> — enables operating system detection to guess the target OS type and kernel.",
+        "<b>192.168.1.50</b> — the specific target host IP address.",
+        "<b>nmap -p 22,80,443 --script vuln 192.168.1.50</b>",
+        "<b>-p 22,80,443</b> — narrows the scan focus strictly to ports 22 (SSH), 80 (HTTP), and 443 (HTTPS).",
+        "<b>--script vuln</b> — activates Nmap Scripting Engine (NSE) vulnerability check scripts against the target to find known security gaps."
+      ],
+      exampleTitle:"From Sweep to Vuln Check",
+      example:[
+        "Start wide: nmap -sn 192.168.1.0/24 lists every live host without touching a port.",
+        "Go deep on one host: -sS -sV -O names services and OS. Then narrow to three ports with --script vuln to check for known gaps."
+      ],
+      game:{type:"match", title:"Match the Nmap Flag",
+        desc:"Tap a flag, then tap what it does.",
+        pairs:[
+          ["-sn","Ping scan for host discovery only"],
+          ["-sS","Stealth SYN scan, half-open connections"],
+          ["-sV","Probe open ports for versions"],
+          ["-O","Guess the operating system"],
+          ["-p 22,80,443","Scan only ports 22, 80 and 443"],
+          ["--script vuln","Run NSE vulnerability checks"],
+        ]},
+      quiz:[
+        {q:"'nmap -sn 192.168.1.0/24' performs:",opts:["A full port scan","Host discovery only, no port scanning","OS detection","A vulnerability scan"],a:1},
+        {q:"The SYN scan (-sS) is stealthier than TCP Connect mainly because it:",opts:["Scans fewer ports","Does not complete the full TCP handshake","Sends smaller packets","Runs on any user"],a:1},
+        {q:"'--script vuln' activates:",opts:["Faster timing","NSE vulnerability check scripts","Graphical output","Decryption"],a:1},
+        {q:"Port 3389 typically runs:",opts:["RDP (Remote Desktop)","MySQL","FTP","DNS"],a:0},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Interpret the Scan",
+    intro:"An authorized Nmap scan was run against a host in the scope. Read the results.",
+    terminal:[
+      {cmd:"nmap -sV -O 203.0.113.10", out:"PORT     STATE    SERVICE    VERSION\n22/tcp   open     ssh        OpenSSH 8.2p1\n80/tcp   open     http       nginx 1.18.0\n443/tcp  open     https      nginx 1.18.0\n3306/tcp open     mysql      MySQL 5.7.33\n8080/tcp filtered n-proxy    -\nMAC Address: 0A:1B:2C:3D:4E:5F"},
+      {cmd:"cat policy.txt", out:"Only report OPEN ports in the deliverable.\nService version matters for CVE matching."},
+    ],
+    question:"Which single port is the best target for finding a known-vulnerable database service?",
+    accept:["3306","mysql"],
+    hint:"Find the open port whose identified service is an outdated database.",
+    successMsg:"Correct — port 3306. The MySQL 5.7.33 service on it is a database with a known-weak version history, making it a priority target.",
+    badge:"Port Profiler", xp:150
+  }
+},{
+  id:6, num:"07", day:2, title:"Introduction to Vulnerability Assessment",
+  focus:"What vulnerabilities and assessments are, the six assessment types, why they matter, and the lifecycle.",
+  lessons:[
+    {
+      title:"Vulnerabilities & Assessment Basics",
+      brief:"A vulnerability is a weakness; an assessment is the structured hunt for it.",
+      concept:[
+        "<b>What is Vulnerability?</b> — a weakness in a system, application, network, configuration, or process that could potentially be exploited and result in unauthorized access, data exposure, disruption, or other security impacts.",
+        "Vulnerabilities can occur because of software defects, outdated systems, insecure configurations, weak security controls, or other weaknesses in an organization's environment.",
+        "<b>What is Vulnerability Assessment?</b> — a structured process used to identify and evaluate security weaknesses within a defined environment. It helps organizations understand where weaknesses exist, assess their potential significance, and determine which issues require attention.",
+        "<b>Vulnerability assessments can cover:</b> Networks, Servers, End-user devices, Web applications, APIs, Databases, Cloud environments, Network devices, and Software and applications.",
+        "<b>A typical assessment follows a continuous process:</b> Discover → Identify → Analyze → Prioritize → Remediate → Verify → Monitor."
+      ],
+      exampleTitle:"One Weakness, Many Doors",
+      example:[
+        "An outdated VPN (software defect) with a default password (weak control) on an unpatched server (outdated system) — three causes, one vulnerability.",
+        "A vulnerability assessment discovers it, analyzes its significance, and queues it for remediation before attackers knock."
+      ],
+      game:{type:"match", title:"Match the Assessment Term",
+        desc:"Tap a term, then tap what it means.",
+        pairs:[
+          ["Vulnerability","A weakness that could be exploited"],
+          ["Vulnerability assessment","Structured process to find and evaluate weaknesses"],
+          ["Discover → Identify → Analyze","First half of the continuous process"],
+          ["Prioritize → Remediate","Decide order, then fix"],
+          ["Verify → Monitor","Confirm fixes, keep watching"],
+        ]},
+      quiz:[
+        {q:"A 'vulnerability' is best defined as:",opts:["An active attack in progress","A weakness that could be exploited by a threat","A response to an incident","A type of firewall"],a:1},
+        {q:"Vulnerabilities can occur because of all EXCEPT:",opts:["Software defects","Insecure configurations","Weak security controls","Strong access controls"],a:3},
+        {q:"Which areas can a vulnerability assessment cover?",opts:["Only web applications","Networks, servers, devices, apps, APIs, databases, cloud and more","Only passwords","Only physical locks"],a:1},
+        {q:"After Remediate comes:",opts:["Discover","Verify, then Monitor","Planning","Payment"],a:1},
+      ]
+    },
+    {
+      title:"Types of Vulnerability Assessment",
+      brief:"Six assessment types — one for each layer of the environment.",
+      concept:[
+        "Vulnerability assessments can be performed using different approaches depending on the technology and environment being assessed.",
+        "<b>Network-Based Assessment</b> — examines network infrastructure to identify potential security weaknesses.",
+        "<b>Host-Based Assessment</b> — examines individual systems such as servers and workstations.",
+        "<b>Wireless Assessment</b> — evaluates an organization's Wi-Fi environment for security weaknesses.",
+        "<b>Application Assessment</b> — evaluates websites, mobile applications, APIs, and other software for security weaknesses.",
+        "<b>Database Assessment</b> — examines database servers and configurations for security weaknesses.",
+        "<b>Cloud and Infrastructure Assessment</b> — evaluates cloud resources and configurations for security weaknesses."
+      ],
+      exampleTitle:"Picking the Right Assessment",
+      example:[
+        "Nimbus Health needs its patient portal tested — that calls for an Application Assessment. Its new AWS setup needs a Cloud and Infrastructure Assessment.",
+        "The office Wi-Fi gets a Wireless Assessment, while the database cluster behind it all gets a Database Assessment."
+      ],
+      game:{type:"match", title:"Match the Assessment Type",
+        desc:"Tap an assessment type, then tap what it examines.",
+        pairs:[
+          ["Network-Based","Network infrastructure"],
+          ["Host-Based","Individual servers and workstations"],
+          ["Wireless","The Wi-Fi environment"],
+          ["Application","Websites, mobile apps, APIs"],
+          ["Database","Database servers and configurations"],
+          ["Cloud & Infrastructure","Cloud resources and configurations"],
+        ]},
+      quiz:[
+        {q:"A Host-Based assessment examines:",opts:["Wi-Fi signals","Individual systems such as servers and workstations","Cloud billing","Mobile app stores"],a:1},
+        {q:"Testing a hospital's Wi-Fi for weaknesses is a:",opts:["Database Assessment","Wireless Assessment","Cloud Assessment","Host-Based Assessment"],a:1},
+        {q:"Which assessment evaluates APIs?",opts:["Network-Based","Application Assessment","Wireless","Host-Based"],a:1},
+      ]
+    },
+    {
+      title:"Why Assessment Matters",
+      brief:"Five reasons organizations assess again and again.",
+      concept:[
+        "Organizations continuously introduce new systems, applications, software, services, and cloud resources. At the same time, new vulnerabilities are discovered regularly. Regular assessment keeps visibility into this changing environment.",
+        "<b>1. Identify security weaknesses</b> — helps discover weaknesses that may otherwise remain unnoticed; finding them early gives a chance to address them before they contribute to an incident.",
+        "<b>2. Reduce attack surface</b> — identifying unnecessary services, outdated software, exposed systems, and insecure configurations reduces opportunities for unauthorized access.",
+        "<b>3. Prioritize remediation</b> — organizations may have many vulnerabilities at once; assessment information helps decide which findings need greater attention based on severity, exposure, asset criticality, and potential impact.",
+        "<b>4. Support compliance</b> — assessment may form part of security and compliance activities; results provide evidence that weaknesses are being identified, tracked, and addressed.",
+        "<b>5. Improve security posture</b> — regular assessments give greater visibility, help identify recurring issues, monitor improvements, and strengthen security controls over time."
+      ],
+      exampleTitle:"From Invisible to Managed",
+      example:[
+        "A quarterly assessment finds an exposed test server nobody remembered — weakness identified, attack surface reduced.",
+        "Ranked by severity and exposure, it is patched this sprint, logged for compliance, and rechecked next quarter. Posture improves every cycle."
+      ],
+      game:{type:"match", title:"Match the Reason",
+        desc:"Tap a reason, then tap what it achieves.",
+        pairs:[
+          ["Identify weaknesses","Catch what would stay unnoticed"],
+          ["Reduce attack surface","Fewer exposed services and systems"],
+          ["Prioritize remediation","Fix what matters most first"],
+          ["Support compliance","Evidence weaknesses are tracked"],
+          ["Improve posture","Stronger controls over time"],
+        ]},
+      quiz:[
+        {q:"Regular assessment maintains:",opts:["Lower budgets","Visibility into a changing security environment","Faster internet","Fewer employees"],a:1},
+        {q:"Prioritization considers all EXCEPT:",opts:["Severity and exposure","Asset criticality and impact","The cleaner's schedule","Business context"],a:2},
+        {q:"Assessment results support compliance by:",opts:["Deleting old logs","Providing evidence weaknesses are identified, tracked and addressed","Hiding incidents","Skipping audits"],a:1},
+      ]
+    },
+    {
+      title:"The Assessment Lifecycle",
+      brief:"Eight steps, end to end — and it never really ends.",
+      concept:[
+        "Vulnerability assessment is a continuous process — from discovery through verification.",
+        "<b>1. Define Scope</b> — determine which systems, applications, networks, devices, and resources are included. A clear scope keeps the assessment authorized, focused, and appropriate.",
+        "<b>2. Discover Assets</b> — identify the assets in scope: servers, workstations, network devices, applications, databases, cloud resources. An accurate inventory prevents systems from being overlooked.",
+        "<b>3. Identify Vulnerabilities</b> — use appropriate tools and techniques: automated scanning, configuration assessment, application testing, or other authorized techniques.",
+        "<b>4. Analyze Findings</b> — review vulnerabilities to understand characteristics and consequences: severity, exploitability, exposure, asset criticality, potential impact.",
+        "<b>5. Prioritize</b> — determine which vulnerabilities get attention first, considering technical characteristics and business context.",
+        "<b>6. Remediate</b> — address vulnerabilities: applying patches, updating software, changing configurations, restricting access, removing unnecessary services, implementing compensating controls.",
+        "<b>7. Verify</b> — after remediation, confirm the fix: rescanning, configuration verification, or other validation activities.",
+        "<b>8. Monitor</b> — keep watching for new assets, new vulnerabilities, configuration changes, and newly disclosed issues.",
+        "<b>Lifecycle summary:</b> Define Scope → Discover → Identify → Analyze → Prioritize → Remediate → Verify → Monitor."
+      ],
+      exampleTitle:"One Finding's Journey",
+      example:[
+        "Scope covers the clinic network; discovery inventories 40 assets; scanning identifies an outdated service; analysis rates it High on an exposed host.",
+        "Prioritized first, patched, rescanned to verify — then monitoring watches for its return. Eight steps, one closed loop."
+      ],
+      game:{type:"order", title:"Order the VA Lifecycle",
+        desc:"Tap the lifecycle steps in order.",
+        items:["Define Scope","Discover Assets","Identify Vulnerabilities","Analyze Findings","Prioritize","Remediate","Verify","Monitor"]},
+      quiz:[
+        {q:"The first lifecycle step is:",opts:["Discover Assets","Define Scope","Remediate","Monitor"],a:1},
+        {q:"Analysis of a finding considers all EXCEPT:",opts:["Severity and exploitability","Exposure and asset criticality","Potential impact","The vendor's stock price"],a:3},
+        {q:"Verification after remediation may involve:",opts:["Deleting the report","Rescanning and configuration verification","Ignoring the system","Resetting all passwords"],a:1},
+        {q:"Monitoring watches for:",opts:["New assets and newly disclosed issues","Lunch menus","Office birthdays","Printer toner"],a:0},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Classify the Finding",
+    intro:"Results from an assessment just landed. Decide what the analyst should prioritize.",
+    terminal:[
+      {cmd:"cat scan_results.txt", out:"Host 192.168.1.45 - port 3306 open (MySQL)\n  Fingerprint: MySQL 5.7.33-log\n  Flagged: outdated version, known CVEs\nHost 192.168.1.45 - SSL/TLS: TLS 1.0 enabled (weak)\nHost 192.168.1.55 - SMBv1 enabled (flag)"},
+      {cmd:"cat report.txt", out:"Step 1: validate each finding against the real service.\nStep 2: prioritize by severity.\nStep 3: write remediation guidance.\nWhich assessment type produced these results?"},
+    ],
+    question:"Which assessment type produced network-service findings like these?",
+    accept:["network","network-based","network based"],
+    hint:"These are infrastructure findings — open ports, TLS versions, SMB — not application flaws.",
+    successMsg:"Correct — a Network-Based Assessment. It examines network infrastructure: services, protocols, and configurations.",
+    badge:"Assessment Planner", xp:150
+  }
+},{
+  id:7, num:"08", day:2, title:"Vulnerability Identification & Analysis",
+  focus:"Where vulnerabilities come from, the identification stages, analysis factors, and validation.",
+  lessons:[
+    {
+      title:"Identification & Common Sources",
+      brief:"Identification finds the weaknesses; sources explain where they creep in.",
+      concept:[
+        "<b>What is Vulnerability Identification?</b> — the process of discovering weaknesses that could potentially be exploited to compromise the confidentiality, integrity, or availability of an information system. While assessment provides the overall process, identification focuses specifically on finding potential weaknesses within the environment.",
+        "<b>Common sources of vulnerabilities:</b>",
+        "<b>Outdated or unsupported software</b> — no longer supported or missing security updates; may contain known weaknesses.",
+        "<b>Missing security patches</b> — failure to apply updates leaves systems exposed to known vulnerabilities.",
+        "<b>Insecure configurations</b> — incorrectly configured settings or disabled controls make systems vulnerable.",
+        "<b>Weak authentication and authorization</b> — weak mechanisms or inappropriate permissions allow unauthorized access.",
+        "<b>Excessive privileges</b> — users, apps, or services with more permissions than necessary increase compromise impact.",
+        "<b>Vulnerable third-party components</b> — external libraries, frameworks, and components pass their flaws to the apps that use them.",
+        "<b>Insecure design or implementation</b> — weaknesses introduced during application design, development, or deployment.",
+        "<b>Exposed services</b> — unnecessary or improperly protected services increase the attack surface."
+      ],
+      exampleTitle:"Eight Doors, One Building",
+      example:[
+        "A clinic server runs an unsupported OS (outdated software), misses two patches, leaves RDP open (exposed service), and grants every intern admin rights (excessive privileges).",
+        "Identification names each weakness and traces it to its source — because the fix differs for a patch, a config, and a permission."
+      ],
+      game:{type:"match", title:"Match the Vulnerability Source",
+        desc:"Tap a source, then tap its meaning.",
+        pairs:[
+          ["Outdated software","Unsupported, missing security updates"],
+          ["Missing patches","Known flaws left unpatched"],
+          ["Insecure configuration","Wrong settings, disabled controls"],
+          ["Weak authentication","Unauthorized users get in"],
+          ["Excessive privileges","More access than necessary"],
+          ["Third-party component","Library flaw inherited by the app"],
+        ]},
+      quiz:[
+        {q:"Vulnerability identification focuses specifically on:",opts:["Writing patches","Finding potential weaknesses in the environment","Deleting old servers","Training users"],a:1},
+        {q:"Exposed services increase:",opts:["Network speed","The attack surface of a system","Disk space","Battery life"],a:1},
+        {q:"Excessive privileges are dangerous because they:",opts:["Slow the system","Increase the impact of a compromise","Improve usability","Reduce log sizes"],a:1},
+        {q:"A flaw in an external library used by an app is a:",opts:["Configuration issue","Third-party component vulnerability","Patching success","Physical threat"],a:1},
+      ]
+    },
+    {
+      title:"Stages of Identification",
+      brief:"Five stages carry a team from unknown assets to validated findings.",
+      concept:[
+        "Vulnerability identification involves several stages that move security teams from discovering assets to obtaining validated findings.",
+        "<b>1. Asset Discovery</b> — identify the systems and resources in scope: servers, applications, databases, network devices, cloud resources.",
+        "<b>2. Information Gathering</b> — collect context about each asset: operating system, software versions, installed components, configuration, network exposure, asset ownership.",
+        "<b>3. Vulnerability Detection</b> — use tools and techniques to find weaknesses: automated scanners, configuration assessments, application security testing, security reviews, manual techniques. Different techniques find different vuln types.",
+        "<b>4. Finding Collection</b> — record each finding with: affected asset, vulnerability description, severity, evidence, recommended remediation.",
+        "<b>5. Initial Validation</b> — review findings to judge whether each is likely genuine; validation filters inaccurate results and builds confidence before remediation."
+      ],
+      exampleTitle:"From Asset to Action",
+      example:[
+        "Discovery lists 40 assets; gathering notes OS and versions; detection flags an outdated database; collection records asset, severity, evidence, and fix.",
+        "Initial validation confirms it is real — only then does it enter the remediation queue."
+      ],
+      game:{type:"order", title:"Order the Identification Stages",
+        desc:"Tap the stages in order.",
+        items:["Asset Discovery","Information Gathering","Vulnerability Detection","Finding Collection","Initial Validation"]},
+      quiz:[
+        {q:"Information gathering collects all EXCEPT:",opts:["OS and software versions","Configuration and exposure","Asset ownership","The CEO's home address"],a:3},
+        {q:"A recorded finding should include:",opts:["Only the asset name","Asset, description, severity, evidence, remediation","Only the severity","Only a screenshot"],a:1},
+        {q:"Initial validation exists to:",opts:["Delete all findings","Filter inaccurate results before remediation","Slow the process","Increase scan speed"],a:1},
+      ]
+    },
+    {
+      title:"Analyzing a Finding",
+      brief:"Never judge a flaw by severity alone — weigh five factors plus context.",
+      concept:[
+        "<b>What is Vulnerability Analysis?</b> — the process of examining an identified vulnerability to understand its characteristics, exploitability, and potential consequences. A vulnerability should not be evaluated on technical severity alone; environment and business context matter too.",
+        "<b>1. Severity</b> — how significant the weakness is: Low, Medium, High, Critical. Frameworks like CVSS communicate technical severity.",
+        "<b>2. Exploitability</b> — conditions and difficulty of exploitation: whether remote access is possible, whether authentication is required, whether user interaction is required, complexity of exploitation, availability of exploitation information.",
+        "<b>3. Exposure</b> — how accessible the system is. Higher exposure: internet-facing apps, public APIs, externally accessible services. Lower exposure: isolated internal systems, restricted admin networks, systems behind strong access controls.",
+        "<b>4. Potential impact</b> — what successful exploitation could cause: unauthorized access, data exposure, data modification, service disruption, loss of confidentiality, integrity, or availability.",
+        "<b>5. Asset criticality</b> — the same flaw matters differently per asset: a flaw in a critical business application needs more attention than the same flaw in a low-impact test system."
+      ],
+      exampleTitle:"Same Flaw, Different Verdict",
+      example:[
+        "A Medium-severity flaw on an internet-facing payment API (high exposure, critical asset) outranks a High-severity flaw on an isolated lab VM.",
+        "Analysis — not the raw score — sets the real priority."
+      ],
+      game:{type:"match", title:"Match the Analysis Factor",
+        desc:"Tap a factor, then tap what it asks.",
+        pairs:[
+          ["Severity","How significant is the weakness?"],
+          ["Exploitability","How hard is it to exploit?"],
+          ["Exposure","How accessible is the system?"],
+          ["Potential impact","What happens if exploited?"],
+          ["Asset criticality","How important is this asset?"],
+        ]},
+      quiz:[
+        {q:"Vulnerability analysis should consider:",opts:["Technical severity only","Severity plus environment and business context","The scanner's brand","The day of the week"],a:1},
+        {q:"Higher exposure includes:",opts:["Isolated internal systems","Internet-facing applications and public APIs","Restricted admin networks","Air-gapped machines"],a:1},
+        {q:"Exploitability factors include all EXCEPT:",opts:["Whether remote access is possible","Whether authentication is required","Complexity of exploitation","The analyst's favorite color"],a:3},
+        {q:"Asset criticality means:",opts:["All assets are equal","The same flaw matters more on critical systems","Test systems come first","Only servers count"],a:1},
+      ]
+    },
+    {
+      title:"Validating Findings",
+      brief:"Scanners lie sometimes — validation separates genuine flaws from noise.",
+      concept:[
+        "Vulnerability assessment tools are valuable, but their results should be reviewed and validated.",
+        "<b>What is a False Positive?</b> — a tool reports a vulnerability, but investigation determines it does not actually exist.",
+        "<b>What is a False Negative?</b> — a vulnerability exists but is not detected by the assessment process.",
+        "<b>Why false negatives matter</b> — they create a false sense of security. Relying only on automated scanning may leave weaknesses unidentified — which is why organizations combine automated tools with manual reviews, configuration assessments, application testing, and other techniques.",
+        "<b>Why validation matters — it helps teams:</b> confirm reported vulnerabilities are genuine; reduce false positives; investigate unexpected findings; improve confidence in results; provide accurate remediation information; avoid spending resources on invalid findings."
+      ],
+      exampleTitle:"The Phantom SQL Injection",
+      example:[
+        "A scanner flags SQL injection on a page that accepts no input — investigation proves it a false positive, dropped before the report.",
+        "Meanwhile a manual review catches a misconfigured share the scanner missed — a false negative that automation alone would never have found."
+      ],
+      game:{type:"sort", title:"False Positive or False Negative?",
+        desc:"Tap each case, then tap its type.",
+        buckets:["False Positive","False Negative"],
+        items:[
+          ["Scanner flags SQLi on input-less page","False Positive"],
+          ["Reported flaw proven nonexistent","False Positive"],
+          ["Alert on a patched service","False Positive"],
+          ["Real misconfiguration scanner missed","False Negative"],
+          ["Manual review catches hidden share","False Negative"],
+          ["Existing flaw never detected","False Negative"],
+        ]},
+      quiz:[
+        {q:"A false positive is:",opts:["A missed real flaw","A reported flaw that does not actually exist","A patched system","A slow scan"],a:1},
+        {q:"False negatives matter because they:",opts:["Waste paper","Create a false sense of security","Speed up scans","Improve passwords"],a:1},
+        {q:"Validation helps teams avoid:",opts:["All scanning","Spending resources on invalid findings","Writing reports","Patching systems"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Validate Before You Report",
+    intro:"A scan report came back with three findings. One of them is not a real problem.",
+    terminal:[
+      {cmd:"cat scan_findings.txt", out:"Finding 1 - Host A: 'TLS 1.0 supported' - confirmed over HTTPS\nFinding 2 - Host B: 'SQL injection in /search' - page takes NO user input\nFinding 3 - Host C: 'Default credentials on admin panel' - tried admin/admin, login FAILED"},
+      {cmd:"cat rules.txt", out:"Only verified findings go into the client report.\nAll others are dropped silently."},
+    ],
+    question:"Which finding should be dropped from the report?",
+    accept:["finding 2","2"],
+    hint:"Ask yourself which finding could not possibly be true given the evidence shown.",
+    successMsg:"Correct — Finding 2. A search page that accepts no user input cannot be SQL-injectable; it is a scanner false positive.",
+    badge:"Finding Validator", xp:150
+  }
+},{
+  id:8, num:"09", day:2, title:"Understanding CVE, CWE & Vulnerability Severity",
+  focus:"CVE identifiers, CWE weakness classes, severity characteristics, and CVSS prioritization.",
+  lessons:[
+    {
+      title:"Understanding CVE",
+      brief:"One flaw, one name worldwide — how CVE identifiers work and why they matter.",
+      concept:[
+        "<b>CVE (Common Vulnerabilities and Exposures)</b> is a system used to identify publicly known cybersecurity vulnerabilities using standardized identifiers. A CVE identifier gives security professionals, vendors, researchers, and organizations a common way to refer to a specific vulnerability.",
+        "<b>CVE identifier format: CVE-YYYY-NNNN</b> — for example, CVE-2024-12345. Where: CVE indicates it is a Common Vulnerabilities and Exposures identifier; YYYY represents the year associated with the CVE; NNNN represents the unique identifier assigned to the vulnerability.",
+        "<b>Why are CVEs important?</b> Without standardized identifiers, different teams or vendors might use different names for the same vulnerability. CVE provides a common reference that helps organizations: identify specific vulnerabilities; search for vulnerability information; correlate findings from different security tools; track vulnerabilities over time; communicate security issues consistently.",
+        "<b>Example:</b> suppose a scanner reports 'CVE-2024-12345 detected on Server A'. Teams use that identifier to locate affected products, severity information, references, and available remediation guidance."
+      ],
+      exampleTitle:"One ID, Whole Story",
+      example:[
+        "Three tools flag the same flaw three different ways — until the analyst spots CVE-2024-12345 in each report and merges them into one finding.",
+        "That ID unlocks the vendor advisory, the severity score, and the patch — everything flows from the identifier."
+      ],
+      game:{type:"match", title:"Match the CVE Part",
+        desc:"Tap a CVE element, then tap what it means.",
+        pairs:[
+          ["CVE prefix","Marks a Common Vulnerabilities and Exposures ID"],
+          ["YYYY (2024)","Year associated with the CVE"],
+          ["NNNN (12345)","Unique identifier of the vulnerability"],
+          ["CVE-2024-12345","One specific known vulnerability"],
+          ["Shared identifier","Lets tools and teams correlate findings"],
+        ]},
+      quiz:[
+        {q:"What does a CVE number uniquely identify?",opts:["A company","One specific publicly disclosed vulnerability","A scanner product","A firewall rule"],a:1},
+        {q:"The correct CVE ID format is:",opts:["CVE-2024-12345","CVE-12345-2024","CVE/2024/12345","12345-CVE-2024"],a:0},
+        {q:"CVEs help organizations:",opts:["Rename servers","Correlate findings from different tools and track issues over time","Delete vulnerabilities","Skip patching"],a:1},
+      ]
+    },
+    {
+      title:"Understanding CWE",
+      brief:"If CVE names the flaw, CWE names the family it belongs to.",
+      concept:[
+        "<b>CWE (Common Weakness Enumeration)</b> is a community-developed classification system for software and hardware weaknesses that can lead to vulnerabilities. While CVE identifies a specific known vulnerability, CWE describes the type or category of weakness associated with it.",
+        "<b>Example:</b> consider an application that fails to properly validate user input. The underlying weakness could be classified as a particular CWE category related to improper input validation. A specific vulnerability resulting from that weakness may receive its own CVE identifier.",
+        "<b>CVE vs CWE:</b> CVE = one specific known vulnerability instance (CVE-2024-12345). CWE = the weakness class or family it belongs to (e.g., improper input validation).",
+        "<b>Why is CWE important?</b> CWE moves teams beyond individual flaws to patterns in how weaknesses are introduced. If an organization repeatedly finds improper-authorization flaws, it signals a broader design or development issue. CWE supports: secure software development, code review, security education, vulnerability analysis, root-cause analysis, and identification of recurring weakness patterns."
+      ],
+      exampleTitle:"Pattern Behind the Bugs",
+      example:[
+        "Five separate CVEs across three apps — all traced to one CWE family: improper input validation. The root cause is a shared coding practice, not five coincidences.",
+        "Fix the pattern with training and code review, and the whole CWE family shrinks."
+      ],
+      game:{type:"match", title:"Match CVE vs CWE",
+        desc:"Tap a term, then tap what it describes.",
+        pairs:[
+          ["CVE-2024-12345","One specific vulnerability instance"],
+          ["CWE category","The weakness family or type"],
+          ["Repeated same-family flaws","Signal a broader design issue"],
+          ["CWE in code review","Catch weakness patterns early"],
+          ["CVE in a scanner report","Look up severity and remediation"],
+        ]},
+      quiz:[
+        {q:"CWE describes:",opts:["A specific vulnerability instance","The type or category of a weakness","A scanner brand","A firewall rule"],a:1},
+        {q:"If many flaws share one CWE family, it suggests:",opts:["Bad luck","A broader design or development issue","Faulty scanners","Too many servers"],a:1},
+        {q:"CWE supports all EXCEPT:",opts:["Secure software development","Code review and education","Root-cause analysis","Password recovery"],a:3},
+      ]
+    },
+    {
+      title:"Understanding Severity",
+      brief:"How bad is it, technically? Categories, characteristics, and the CIA triad.",
+      concept:[
+        "<b>Vulnerability severity</b> describes the technical seriousness of a vulnerability and the potential consequences of its exploitation. Severity helps teams communicate significance and supports remediation prioritization.",
+        "<b>Common severity categories:</b> Informational, Low, Medium, High, Critical. Exact categories and thresholds depend on the scoring system used.",
+        "<b>Characteristics that influence severity:</b>",
+        "<b>1. Attack Vector</b> — how can it be accessed? Network, adjacent network, local, or physical. Remote network access differs greatly from requiring local access.",
+        "<b>2. Attack Complexity</b> — how difficult is exploitation? Some flaws exploit under straightforward conditions; others need specific circumstances.",
+        "<b>3. Privileges Required</b> — does the attacker need an account or elevated permissions? No privileges differs from requiring significant access.",
+        "<b>4. User Interaction</b> — must another user act (open a file, interact with an app) for exploitation to succeed?",
+        "<b>5. Impact</b> — potential effects on Confidentiality (could sensitive info be disclosed?), Integrity (could info be modified?), Availability (could systems become unavailable?). These three form the CIA triad.",
+        "<b>Example:</b> Vulnerability A needs local access, user privileges, and has limited impact. Vulnerability B is remotely accessible, needs no authentication, and could badly affect confidentiality, integrity, or availability. The two have very different technical severity."
+      ],
+      exampleTitle:"A vs B",
+      example:[
+        "Vuln A: local access, privileges required, limited impact — modest severity. Vuln B: remote, unauthenticated, CIA-wide impact — severe.",
+        "Same scanner, same report — but attack vector, privileges, and impact separate a footnote from a fire drill."
+      ],
+      game:{type:"match", title:"Match the Severity Factor",
+        desc:"Tap a factor, then tap the question it asks.",
+        pairs:[
+          ["Attack Vector","How can the flaw be accessed?"],
+          ["Attack Complexity","How difficult is exploitation?"],
+          ["Privileges Required","Does the attacker need an account?"],
+          ["User Interaction","Must another user act?"],
+          ["Confidentiality impact","Could sensitive info be disclosed?"],
+          ["Availability impact","Could systems become unavailable?"],
+        ]},
+      quiz:[
+        {q:"Severity categories from lowest to highest:",opts:["Low, High, Critical","Informational, Low, Medium, High, Critical","Medium, Low, High","Critical, High, Medium, Low"],a:1},
+        {q:"The CIA triad stands for:",opts:["Central Intelligence Agency","Confidentiality, Integrity, Availability","Critical Infrastructure Assessment","Cloud, Internet, Access"],a:1},
+        {q:"A remotely exploitable flaw with no privileges required is generally:",opts:["Less severe","More severe than one needing local access","Unscorable","Informational only"],a:1},
+      ]
+    },
+    {
+      title:"CVSS & Prioritization",
+      brief:"Scores measure severity — but context decides priority.",
+      concept:[
+        "<b>What is CVSS?</b> — the Common Vulnerability Scoring System, a standardized framework for communicating vulnerability severity. CVSS provides a numerical score, ranging from 0.0 to 10.0, that helps organizations understand and compare technical severity.",
+        "<b>CVSS score vs organizational risk:</b> CVSS severity is NOT the same as organizational risk. A high-CVSS flaw's real priority depends on environment. Example: System A has a High CVSS flaw but is an isolated internal test system with no sensitive data and strong controls. System B has a Medium CVSS flaw but is internet-facing, business-critical, and handles sensitive information. The organization may prioritize System B. Combine technical severity with environmental and business context — never treat one score as the final answer.",
+        "<b>Factors that can influence prioritization:</b> CVSS severity, internet exposure, asset criticality, sensitivity of data, exploitability, availability of a security update, existing security controls, evidence of active exploitation, business impact, regulatory requirements.",
+        "<b>Example vulnerability record:</b> Finding — known vulnerability in a web application component. CVE: CVE-202X-XXXXX. CWE: CWE-XXX. CVSS: 8.2 — High. Affected asset: internet-facing customer application. Potential impact: unauthorized access or exposure of sensitive information. Assessment: technical severity is high AND the asset is business-critical — weigh both when setting remediation priority."
+      ],
+      exampleTitle:"Score High, Priority Low?",
+      example:[
+        "A 9.8 flaw sits on a powered-off lab VM with no data — technically critical, practically waiting its turn.",
+        "A 6.5 flaw faces the internet on the payment API with exploit chatter online — patched tonight. Context beats score."
+      ],
+      game:{type:"sort", title:"Higher or Lower Priority?",
+        desc:"Tap each context, then tap its priority signal.",
+        buckets:["Higher Priority","Lower Priority"],
+        items:[
+          ["Internet-facing payment API","Higher Priority"],
+          ["Evidence of active exploitation","Higher Priority"],
+          ["Handles sensitive customer data","Higher Priority"],
+          ["No patch available + critical asset","Higher Priority"],
+          ["Isolated test VM, no data","Lower Priority"],
+          ["Strong controls, internal only","Lower Priority"],
+        ]},
+      quiz:[
+        {q:"CVSS scores range from:",opts:["1 to 5","0.0 to 10.0","0 to 100","A to F"],a:1},
+        {q:"CVSS severity vs organizational risk:",opts:["They are identical","CVSS is technical severity; real priority needs environment context","Risk ignores CVSS","CVSS measures money"],a:1},
+        {q:"Prioritization may consider all EXCEPT:",opts:["Internet exposure and asset criticality","Evidence of active exploitation","Business impact and regulations","The analyst's lunch order"],a:3},
+        {q:"A good vulnerability record includes:",opts:["CVE, CWE, CVSS, asset, impact, assessment","Only the CVE number","Only a screenshot","Only the date"],a:0},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Rate the Severity",
+    intro:"Known-vulnerable components were found in the client environment. Sort them for the report.",
+    terminal:[
+      {cmd:"cat cve_list.txt", out:"Component 1: Log4j 2.14 - CVE-2021-44228 - CVSS 10.0\nComponent 2: PHP 7.4.3 - CVE-2019-11043 - CVSS 9.8\nComponent 3: OpenSSL 1.0.2 - CVE-2016-6309 - CVSS 5.2\nComponent 4: nginx 1.18.0 - CVE-2019-9511 - CVSS 7.0"},
+      {cmd:"cat client_rules.txt", out:"Present the report in CVSS severity order, highest first."},
+    ],
+    question:"Which component must appear FIRST in the report (highest severity)?",
+    accept:["log4j","1"],
+    hint:"The highest CVSS score belongs first.",
+    successMsg:"Correct — Component 1 (Log4j, CVSS 10.0). Critical severity always leads the report.",
+    badge:"Risk Ranker", xp:150
+  }
+},{
+  id:9, num:"10", day:2, title:"Basic Web & Service Vulnerability Assessment",
+  focus:"Web vs service assessment, six web areas, five service steps, and the reporting process.",
+  lessons:[
+    {
+      title:"Web & Service Assessment Intro",
+      brief:"Web apps and network services are the most exposed parts of any organization — learn what each assessment covers.",
+      concept:[
+        "<b>Web vulnerability assessment</b> is the process of identifying and evaluating security weaknesses in web applications, websites, APIs, and related components.",
+        "<b>Web applications commonly interact with:</b> users, databases, APIs, authentication systems, file storage, and external services. Because of these interactions, weaknesses in one component can affect the security of the overall application.",
+        "<b>Service vulnerability assessment</b> focuses on network-accessible services running on systems or devices. Examples: web servers, DNS services, mail services, file-sharing services, database services, remote administration services.",
+        "<b>Why is this assessment important?</b> Organizations expose web applications and services to users, partners, or the internet. A weakness in an exposed application or service can let an attacker: access unauthorized functionality, obtain sensitive information, disrupt services, compromise accounts, or gain unauthorized access to systems."
+      ],
+      exampleTitle:"One Weak Link, Whole Chain",
+      example:[
+        "A clinic's appointment app talks to users, a database, an API, and file storage. A flaw in file uploads alone could expose patient records across the whole chain.",
+        "Meanwhile an forgotten mail service on the same network offers a second, quieter way in. Both assessments matter."
+      ],
+      game:{type:"sort", title:"Web Component or Network Service?",
+        desc:"Tap each item, then tap which assessment covers it.",
+        buckets:["Web Application","Network Service"],
+        items:[
+          ["Login form and sessions","Web Application"],
+          ["API parameters","Web Application"],
+          ["File upload feature","Web Application"],
+          ["DNS service","Network Service"],
+          ["Mail service","Network Service"],
+          ["Database service","Network Service"],
+          ["Remote admin service","Network Service"],
+        ]},
+      quiz:[
+        {q:"Web vulnerability assessment evaluates:",opts:["Only passwords","Web apps, websites, APIs and related components","Only firewalls","Only laptops"],a:1},
+        {q:"A weakness in one web component can:",opts:["Never spread","Affect the security of the overall application","Improve speed","Fix itself"],a:1},
+        {q:"Which is a network-accessible service?",opts:["A login form","A DNS service","A cookie","A URL parameter"],a:1},
+        {q:"An exposed-app weakness can let attackers:",opts:["Compromise accounts and access systems","Speed up the site","Reduce hosting costs","Write better code"],a:0},
+      ]
+    },
+    {
+      title:"Assessing Web Apps: Six Areas",
+      brief:"Authentication to info exposure — the six areas every web assessment must cover.",
+      concept:[
+        "Web applications should be assessed across multiple security areas.",
+        "<b>1. Authentication</b> — determines whether a user is who they claim to be. Consider: password requirements, login controls, account lockout mechanisms, multi-factor authentication, session handling. Example: without protected authentication, unauthorized users may gain access to accounts.",
+        "<b>2. Authorization</b> — determines what an authenticated user may access. Check whether users can reach functions or data beyond their permissions. Example: a regular user must not reach admin functions by changing a URL or parameter.",
+        "<b>3. Input Validation</b> — applications accept input: search fields, login forms, file uploads, API parameters, comments. Input should be validated and handled appropriately to reduce risk.",
+        "<b>4. Session Management</b> — sessions maintain authenticated state. Examine whether: sessions are protected, sessions expire appropriately, session identifiers are handled securely, logout properly terminates the session.",
+        "<b>5. Security Configuration</b> — review app and server configurations: unnecessary features enabled, excessive information disclosure, insecure security settings, missing security controls.",
+        "<b>6. Sensitive Information Exposure</b> — check whether sensitive data leaks through: application responses, error messages, logs, configuration files, publicly accessible resources."
+      ],
+      exampleTitle:"Six Doors, Six Locks",
+      example:[
+        "The portal has no lockout (authentication), lets patients view other records by editing an ID (authorization), and echoes database errors (info exposure).",
+        "Three areas, three findings — one assessment pass, because the checklist covered all six."
+      ],
+      game:{type:"match", title:"Match the Web Assessment Area",
+        desc:"Tap an area, then tap what it checks.",
+        pairs:[
+          ["Authentication","Are users really who they claim?"],
+          ["Authorization","Can users reach beyond permissions?"],
+          ["Input Validation","Is user input handled safely?"],
+          ["Session Management","Are sessions protected and expired?"],
+          ["Security Configuration","Are settings hardened, features trimmed?"],
+          ["Info Exposure","Does sensitive data leak anywhere?"],
+        ]},
+      quiz:[
+        {q:"A user reaching admin functions by editing a URL is a failure of:",opts:["Authentication","Authorization","Input validation","Session management"],a:1},
+        {q:"Account lockout mechanisms belong to:",opts:["Session management","Authentication","Authorization","Configuration"],a:1},
+        {q:"Database errors shown to visitors are:",opts:["Good debugging","Sensitive information exposure","Proper logging","Encryption"],a:1},
+        {q:"Logout must:",opts:["Change the theme","Properly terminate the session","Delete the account","Clear the cache only"],a:1},
+      ]
+    },
+    {
+      title:"Assessing Services: Five Steps",
+      brief:"Unnecessary or insecure services widen the attack surface — find, version, check, review, and weigh exposure.",
+      concept:[
+        "Network services provide functionality, but unnecessary or insecure services increase an organization's attack surface.",
+        "<b>1. Identify exposed services</b> — determine which services are accessible in scope: web, database, file-sharing, mail, remote administration services. Unnecessary services should be reviewed and, where appropriate, disabled or restricted.",
+        "<b>2. Identify service versions</b> — determine software and versions of exposed services, to learn whether: the software is outdated, the version is supported, known vulnerabilities may apply, security updates are available.",
+        "<b>3. Check for known vulnerabilities</b> — compare service and version against trusted sources: CVE information, vendor security advisories, vulnerability databases, security assessment tools. This connects directly to the previous module's concepts.",
+        "<b>4. Review configuration</b> — a service may be vulnerable by configuration, not by defect. Review: access controls, authentication, encryption, default settings, unnecessary features, network restrictions.",
+        "<b>5. Evaluate exposure</b> — determine who can reach the service. Internet → Service means far greater external exposure than Restricted Internal Network → Service. Weigh exposure alongside asset criticality and severity."
+      ],
+      exampleTitle:"The Database Nobody Needed",
+      example:[
+        "Step 1 finds MySQL listening publicly; step 2 versions it as outdated; step 3 matches known CVEs; step 4 finds default credentials; step 5 confirms internet exposure.",
+        "Five steps, one verdict: restrict, patch, and re-verify — a textbook service finding."
+      ],
+      game:{type:"order", title:"Order the Service Assessment",
+        desc:"Tap the service assessment steps in order.",
+        items:["Identify Exposed Services","Identify Service Versions","Check Known Vulnerabilities","Review Configuration","Evaluate Exposure"]},
+      quiz:[
+        {q:"Unnecessary exposed services should be:",opts:["Ignored","Reviewed and disabled or restricted","Advertised","Left running forever"],a:1},
+        {q:"Version identification helps determine:",opts:["The server's color","Whether known vulnerabilities may apply","The admin's name","The office location"],a:1},
+        {q:"Checking CVEs and vendor advisories happens in step:",opts:["1","3","5","2"],a:1},
+        {q:"Internet-facing vs restricted-internal access is weighed in:",opts:["Evaluate Exposure","Identify Versions","Review Configuration","Define Scope"],a:0},
+      ]
+    },
+    {
+      title:"Process & Reporting",
+      brief:"Scope, discover, assess, validate, analyze, report, remediate — then prove it with a proper finding record.",
+      concept:[
+        "A basic web and service vulnerability assessment follows a structured process.",
+        "<b>1. Define Scope</b> — determine which applications, services, systems, and environments are authorized for assessment.",
+        "<b>2. Discover</b> — identify web applications, APIs, network services, accessible endpoints, relevant technologies.",
+        "<b>3. Assess</b> — review for weaknesses via automated scanning, configuration assessment, application security testing, manual review.",
+        "<b>4. Validate</b> — confirm findings are genuine; reduces false positives, incorrect classifications, unnecessary remediation.",
+        "<b>5. Analyze</b> — for each valid finding consider: CVE and CWE where applicable, CVSS severity, exposure, asset criticality, potential impact, existing security controls.",
+        "<b>6. Report</b> — each finding must give the responsible team enough to understand and fix the issue.",
+        "<b>Example finding — Outdated Web Server Software:</b> Affected asset: Web Server. Observation: an outdated version was identified. Potential risk: the version may contain known weaknesses. Severity: based on vulnerability information and context. Recommendation: upgrade to a supported version and verify. Status: Open.",
+        "<b>7. Remediate and Verify</b> — after remediation: Fix → Reassess → Verify. Confirm the vulnerability is appropriately addressed."
+      ],
+      exampleTitle:"From Finding to Fixed",
+      example:[
+        "Scope covers the portal; discovery maps its API; assessment flags outdated server software; validation confirms it; analysis rates it High on an exposed asset.",
+        "The report records asset, observation, risk, severity, recommendation, and status — then reassessment verifies the upgrade closed it."
+      ],
+      game:{type:"match", title:"Match the Process Step",
+        desc:"Tap a step, then tap its purpose.",
+        pairs:[
+          ["Define Scope","Set what is authorized to test"],
+          ["Discover","Map apps, APIs, services, endpoints"],
+          ["Assess","Scan, test, and review for weaknesses"],
+          ["Validate","Confirm findings are genuine"],
+          ["Analyze","Weigh CVE, CVSS, exposure, impact"],
+          ["Report","Give teams enough to fix it"],
+        ]},
+      quiz:[
+        {q:"Validation reduces all EXCEPT:",opts:["False positives","Incorrect classifications","Unnecessary remediation","Real vulnerabilities"],a:3},
+        {q:"A proper finding record includes:",opts:["Asset, observation, risk, severity, recommendation, status","Only a screenshot","Only the date","Only the tester's name"],a:0},
+        {q:"After remediation comes:",opts:["A new scope","Fix → Reassess → Verify","Deletion of logs","A press release"],a:1},
+        {q:"Analysis of each finding considers:",opts:["Only the CVE number","CVE, CVSS, exposure, criticality, impact, controls","Only the price","Only the vendor"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Pick the Top Priority",
+    intro:"A web assessment found four issues. Choose what gets patched this sprint.",
+    terminal:[
+      {cmd:"cat findings.txt", out:"A - SQL injection in the login form (CVSS 9.4)\nB - Missing 'X-Frame-Options' header (CVSS 5.4)\nC - Informational: filesystem reveals Apache version\nD - Self-XSS in the profile settings page (CVSS 4.3)"},
+      {cmd:"cat policy.txt", out:"Client only patches Critical (9.0+) and High (7.0-8.9) findings this sprint."},
+    ],
+    question:"Which single letter belongs in the Critical/High section and gets patched this sprint?",
+    accept:["a"],
+    hint:"Only one finding has a CVSS score in the Critical band.",
+    successMsg:"Correct — A, the SQL injection at CVSS 9.4. It is Critical; the others fall below 7.0 and wait.",
+    badge:"Report Writer", xp:150
+  }
+},{
+  id:10, num:"11", day:2, title:"Attack Surface & Vulnerability Mapping",
+  focus:"Attack surfaces, vulnerability mapping, the six-step process, and mapping tools.",
+  lessons:[
+    {
+      title:"Introduction to Attack Surface",
+      brief:"Everything an attacker could touch, collected in one view.",
+      concept:[
+        "<b>What is an Attack Surface?</b> — the collection of systems, applications, services, devices, and other entry points that could potentially be targeted or exploited by an attacker. Attack surface discovery is the process of identifying and documenting an organization's exposed or accessible assets.",
+        "<b>Examples of attack surface:</b> domains and subdomains; public IP addresses and IP ranges; open ports and services; web applications and APIs; cloud and remote-access services; development and testing environments.",
+        "<b>Simple flow:</b> Discover Assets → Identify Services → Identify Technologies → Map the Attack Surface."
+      ],
+      exampleTitle:"The Dev Server Nobody Listed",
+      example:[
+        "The official asset list shows the main site and API. Discovery adds a forgotten dev environment and an old VPN gateway — both reachable, neither monitored.",
+        "The attack surface was bigger than the inventory. Discovery closed that gap."
+      ],
+      game:{type:"sort", title:"Attack Surface or Not?",
+        desc:"Tap each item, then tap whether it belongs to the attack surface.",
+        buckets:["Attack Surface","Not Attack Surface"],
+        items:[
+          ["Public subdomains","Attack Surface"],
+          ["Open ports and services","Attack Surface"],
+          ["Web applications and APIs","Attack Surface"],
+          ["Dev and test environments","Attack Surface"],
+          ["Cloud remote-access services","Attack Surface"],
+          ["An unplugged office printer","Not Attack Surface"],
+          ["A paper lunch menu","Not Attack Surface"],
+        ]},
+      quiz:[
+        {q:"The attack surface is best defined as:",opts:["Only publicly known CVEs","The collection of entry points an attacker could target","The list of employees","The firewall rules"],a:1},
+        {q:"Attack surface discovery is:",opts:["Exploiting servers","Identifying and documenting exposed assets","Deleting old accounts","Writing firewall rules"],a:1},
+        {q:"Which belongs to the attack surface?",opts:["Development and testing environments","A paper lunch menu","An unplugged printer","Office furniture"],a:0},
+        {q:"The simple attack-surface flow ends with:",opts:["Discover Assets","Map the Attack Surface","Identify Services","Buy new servers"],a:1},
+      ]
+    },
+    {
+      title:"What Is Vulnerability Mapping?",
+      brief:"Link every weakness to its asset, location, component, and impact.",
+      concept:[
+        "<b>Vulnerability Mapping</b> is the process of identifying security weaknesses and linking them to the affected systems, applications, services, or components.",
+        "<b>It maps:</b> what asset is affected? what vulnerability exists? where is the vulnerability located? what component is responsible? what is the potential impact?",
+        "<b>Simple example:</b> www.example.com + Web Server → Outdated component. api.example.com + REST API → Authentication weakness. mail.example.com + Mail Server → Configuration issue."
+      ],
+      exampleTitle:"Three Assets, Three Links",
+      example:[
+        "The portal's outdated web server, the API's weak authentication, the mail server's bad config — three findings, each pinned to its asset and component.",
+        "Without the links, the team has a pile of flaws. With them, each owner knows exactly what to fix."
+      ],
+      game:{type:"match", title:"Match the Mapping Link",
+        desc:"Tap an asset finding, then tap what it maps to.",
+        pairs:[
+          ["www.example.com outdated","Web Server component"],
+          ["api.example.com weak auth","REST API component"],
+          ["mail.example.com misconfig","Mail Server component"],
+          ["What asset?","Which system is affected"],
+          ["What impact?","Consequences if exploited"],
+        ]},
+      quiz:[
+        {q:"Vulnerability mapping associates:",opts:["CVE IDs with charts","Weaknesses with their affected assets and components","A scanner with a license","Malware with a C2 server"],a:1},
+        {q:"Mapping answers all EXCEPT:",opts:["What asset is affected","Where is the flaw located","What component is responsible","What the analyst had for lunch"],a:3},
+        {q:"An outdated component on www.example.com maps to:",opts:["The REST API","The Web Server component","The mail queue","The DNS zone"],a:1},
+      ]
+    },
+    {
+      title:"The Mapping Process",
+      brief:"Six steps from discovery to prioritized fixes — plus why validation and mapping matter.",
+      concept:[
+        "<b>How they work together:</b>",
+        "<b>1. Asset Discovery</b> — identify domains, IP addresses, applications, APIs, and services.",
+        "<b>2. Technology Identification</b> — determine the technologies and software components being used.",
+        "<b>3. Service Enumeration</b> — identify accessible ports, services, applications, and endpoints.",
+        "<b>4. Vulnerability Assessment</b> — check identified assets for known vulnerabilities, weaknesses, and misconfigurations.",
+        "<b>5. Vulnerability Mapping</b> — link each finding to the affected asset and component.",
+        "<b>6. Risk Prioritization</b> — prioritize findings based on severity, exposure, asset importance, and potential impact.",
+        "<b>Why validation is important:</b> automated scanners can sometimes produce false positives. Security professionals should validate important findings before reporting them as confirmed vulnerabilities.",
+        "<b>Importance of attack surface & vulnerability mapping:</b> provides visibility — shows what assets and services are exposed; identifies weaknesses — connects vulnerabilities to specific assets; supports prioritization — helps teams decide which findings need attention; improves remediation — makes it easier to determine where fixes apply; reduces unknown exposure — finds forgotten or unnecessary assets."
+      ],
+      exampleTitle:"From Scattered Notes to a Plan",
+      example:[
+        "Discovery finds four subdomains; technology ID names WordPress and Node; enumeration lists open services; assessment flags CVEs; mapping links each flaw to its host.",
+        "Prioritization leads with the exposed database, validation drops one false positive — the client gets a plan, not a pile."
+      ],
+      game:{type:"order", title:"Order the Mapping Process",
+        desc:"Tap the mapping steps in order.",
+        items:["Asset Discovery","Technology Identification","Service Enumeration","Vulnerability Assessment","Vulnerability Mapping","Risk Prioritization"]},
+      quiz:[
+        {q:"Which step follows 'Technology Identification'?",opts:["Discover assets","Service Enumeration","Write the report","Patch servers"],a:1},
+        {q:"Risk prioritization is based on:",opts:["Alphabetical order","Severity, exposure, asset importance, impact","Scanner speed","Report length"],a:1},
+        {q:"Important findings should be validated because scanners:",opts:["Are always right","Can produce false positives","Never make mistakes","Write reports"],a:1},
+        {q:"Mapping reduces unknown exposure by:",opts:["Deleting assets","Finding forgotten or unnecessary assets","Hiding subdomains","Blocking the internet"],a:1},
+      ]
+    },
+    {
+      title:"Mapping Tools: Nmap, Nuclei, Nikto",
+      brief:"The exact commands that feed the map — ports, vulns, and web misconfigurations.",
+      concept:[
+        "<b>Nmap — identifies open ports, services, and service versions.</b>",
+        "<b>nmap -sV example.com</b>",
+        "<b>nmap</b> — network discovery and security auditing tool.",
+        "<b>-sV</b> — attempts to identify running services and their versions.",
+        "<b>Nuclei — identifies potential known vulnerabilities, misconfigurations, and exposed components.</b>",
+        "<b>nuclei -u https://example.com</b>",
+        "<b>nuclei</b> — template-based security scanning tool.",
+        "<b>-u</b> — specifies the target URL to scan.",
+        "<b>Nikto — identifies potential outdated software, dangerous files, and server misconfigurations.</b>",
+        "<b>nikto -h https://example.com</b>",
+        "<b>nikto</b> — web server assessment tool.",
+        "<b>-h (-host)</b> — specifies the target host or URL."
+      ],
+      exampleTitle:"Three Scans, One Map",
+      example:[
+        "nmap -sV lists what is open and versioned; nuclei -u template-scans it for known vulns and misconfigurations; nikto -h audits the web server for outdated software and dangerous files.",
+        "Each tool fills one column of the map: services, vulnerabilities, misconfigurations."
+      ],
+      game:{type:"match", title:"Match the Mapping Tool",
+        desc:"Tap a tool or flag, then tap what it does.",
+        pairs:[
+          ["nmap","Network discovery and auditing tool"],
+          ["-sV","Identify services and versions"],
+          ["nuclei","Template-based vulnerability scanning"],
+          ["-u","Specifies the target URL to scan"],
+          ["nikto","Web server assessment tool"],
+          ["-h (-host)","Specifies the target host or URL"],
+        ]},
+      quiz:[
+        {q:"'nmap -sV example.com' identifies:",opts:["Passwords","Running services and their versions","Email content","SSL keys"],a:1},
+        {q:"Nuclei is best described as a:",opts:["Template-based security scanning tool","Password cracker","Packet sniffer","Firewall"],a:0},
+        {q:"Nikto helps identify:",opts:["Wi-Fi passwords","Outdated software, dangerous files, server misconfigurations","Employee names","DNS zones"],a:1},
+        {q:"The final deliverable of mapping is:",opts:["A network diagram only","A prioritized report leading with the most critical attack paths","A list of IP addresses","A set of credentials"],a:1},
+      ]
+    },
+  ],
+  challenge:{
+    title:"Complete the Attack Surface Map",
+    intro:"Merge the inspection results into the one report the client will actually read.",
+    terminal:[
+      {cmd:"cat assets.txt", out:"ASSETS FOUND:\n  portal.nimbushealth.com (203.0.113.10) - nginx 1.18, PHP 7.4, WordPress 5.8\n  api.nimbushealth.com (203.0.113.11) - OpenAPI, Node 14\n  internal-db.nimbushealth.com (203.0.113.20) - tcp/3306 MySQL 5.7"},
+      {cmd:"cat cve_matches.txt", out:"WordPress 5.8 - CVE-2021-29447 (9.8)\nNode 14 - CVE-2022-21824 (9.2)\nMySQL 5.7 - CVE-2018-2562 (5.2)"},
+    ],
+    question:"Which asset hosts the single highest-severity CVE (CVSS 9.8)?",
+    accept:["portal","wordpress"],
+    hint:"Look at the CVSS scores next to each matched CVE.",
+    successMsg:"Correct — the WordPress portal (CVE-2021-29447, CVSS 9.8). It leads the prioritized attack surface map.",
+    badge:"Surface Mapper", xp:150
+  }
+},
+];
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+let state = {
+  view:"home",                 // home | module | lesson | challenge | moduleComplete | badge
+  moduleIdx:0,
+  lessonIdx:0,
+  step:0,                      // 0 brief 1 concept 2 example 3 game 4 quiz
+  quizIdx:0,
+  xp:0,
+  hearts:5,
+  completedLessons:new Set(),  // "m-l" keys
+  completedModules:new Set(),  // module idx
+  history:[],                  // for back button
+};
+function lessonKey(m,l){return m+"-"+l;}
+function isModuleUnlocked(i){return i===0 || state.completedModules.has(i-1);}
+function isLessonUnlocked(m,l){
+  if(l===0) return true;
+  return state.completedLessons.has(lessonKey(m,l-1));
+}
+function moduleLessonsDone(m){
+  return MODULES[m].lessons.every((_,li)=>state.completedLessons.has(lessonKey(m,li)));
+}
+
+function go(view, extra){
+  state.history.push({view:state.view, moduleIdx:state.moduleIdx, lessonIdx:state.lessonIdx, step:state.step});
+  Object.assign(state, {view}, extra||{});
+  render();
+}
+function goBack(){
+  if(state.view==="home"){ return; }
+  const prev = state.history.pop();
+  if(prev){ Object.assign(state, prev); } else { state.view="home"; }
+  render();
+}
+document.getElementById("backBtn").addEventListener("click", goBack);
+
+function addXP(n){ state.xp += n; document.getElementById("xpVal").textContent = state.xp; }
+function loseHeart(){
+  state.hearts = Math.max(0, state.hearts-1);
+  document.getElementById("heartsVal").textContent = state.hearts;
+  document.getElementById("heartsVal").parentElement.classList.add("shake");
+  setTimeout(()=>document.getElementById("heartsVal").parentElement.classList.remove("shake"),500);
+}
+function updateTopProgress(){
+  const total = MODULES.reduce((a,m)=>a+m.lessons.length+1,0);
+  let done=0;
+  MODULES.forEach((m,mi)=>{
+    m.lessons.forEach((_,li)=>{ if(state.completedLessons.has(lessonKey(mi,li))) done++; });
+    if(state.completedModules.has(mi)) done++;
+  });
+  document.getElementById("topProgress").style.width = Math.round(done/total*100)+"%";
+}
+
+/* =========================================================================
+   RENDER: ROUTER
+   ========================================================================= */
+function render(){
+  const app = document.getElementById("app");
+  updateTopProgress();
+  document.getElementById("backBtn").style.visibility = state.view==="home" ? "hidden":"visible";
+  if(state.view==="home") return renderHome(app);
+  if(state.view==="module") return renderModule(app);
+  if(state.view==="lesson") return renderLesson(app);
+  if(state.view==="challenge") return renderChallenge(app);
+  if(state.view==="lessonComplete") return renderLessonComplete(app);
+  if(state.view==="moduleComplete") return renderModuleComplete(app);
+}
+
+/* ---------------- HOME ---------------- */
+function moduleRowHTML(i){
+  const m = MODULES[i];
+  const unlocked = isModuleUnlocked(i);
+  const done = state.completedModules.has(i);
+  const lessonsDone = m.lessons.filter((_,li)=>state.completedLessons.has(lessonKey(i,li))).length;
+  return `<div class="module-row ${unlocked?'':'locked'}" data-idx="${i}">
+    <div class="m-badge ${done?'done':(unlocked?'':'locked')}">${done?'&#10003;':m.num}</div>
+    <div class="m-info">
+      <h3>Module ${m.num} — ${m.title}</h3>
+      <p>${m.focus}</p>
+    </div>
+    <div class="m-meta">${lessonsDone}/${m.lessons.length} lessons</div>
+    ${done?'<div class="m-check">&#10003;</div>':(unlocked?'':'<div class="m-lock">&#128274;</div>')}
+  </div>`;
+}
+function renderHome(app){
+  const totalLessons = MODULES.reduce((a,m)=>a+m.lessons.length,0);
+  const doneLessons = state.completedLessons.size;
+  const doneModules = state.completedModules.size;
+  const day1 = MODULES.map((m,i)=>i).filter(i=>MODULES[i].day===1);
+  const day2 = MODULES.map((m,i)=>i).filter(i=>MODULES[i].day===2);
+  app.innerHTML = `
+    <div class="hero">
+      <h1>CyberThulir — 2-Day Workshop</h1>
+      <p>Beginner Tier — ethical hacking fundamentals to vulnerability assessment &amp; reporting. Day 1: Modules 01–06 &middot; Day 2: Modules 07–11. No prior cybersecurity knowledge assumed.</p>
+      <div class="hero-stats">
+        <div><b>${doneModules}/${MODULES.length}</b>Modules complete</div>
+        <div><b>${doneLessons}/${totalLessons}</b>Lessons complete</div>
+        <div><b>${state.xp}</b>Total XP</div>
+      </div>
+    </div>
+    <div class="day-head"><span>DAY 1 — HACKING FUNDAMENTALS</span><small>Modules 01–06</small></div>
+    <div class="path">
+      ${day1.map(i=>moduleRowHTML(i)).join("")}
+    </div>
+    <div class="day-head day2"><span>DAY 2 — VULNERABILITY ASSESSMENT</span><small>Modules 07–11</small></div>
+    <div class="path">
+      ${day2.map(i=>moduleRowHTML(i)).join("")}
+    </div>
+  `;
+  app.querySelectorAll(".module-row").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const idx = parseInt(el.dataset.idx);
+      if(!isModuleUnlocked(idx)) return;
+      go("module", {moduleIdx:idx});
+    });
+  });
+}
+
+/* ---------------- MODULE ---------------- */
+function renderModule(app){
+  const m = MODULES[state.moduleIdx];
+  const allLessonsDone = moduleLessonsDone(state.moduleIdx);
+  const moduleDone = state.completedModules.has(state.moduleIdx);
+  app.innerHTML = `
+    <div class="module-head">
+      <div class="kicker">Day ${m.day} &middot; Module ${m.num} &middot; Beginner</div>
+      <h2>${m.title}</h2>
+      <p>${m.focus}</p>
+    </div>
+    <div class="lesson-list">
+      ${m.lessons.map((l,li)=>{
+        const unlocked = isLessonUnlocked(state.moduleIdx, li);
+        const done = state.completedLessons.has(lessonKey(state.moduleIdx,li));
+        return `<div class="lesson-row ${unlocked?'':'locked'}" data-idx="${li}">
+          <div class="l-num ${done?'done':''}">${done?'&#10003;':(li+1)}</div>
+          <div style="flex:1">
+            <div class="l-title">${l.title}</div>
+            <div class="l-sub">${done?'Completed':(unlocked?'Tap to start':'Locked — finish the previous lesson')}</div>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="challenge-card ${allLessonsDone?'':'locked'}" id="challengeCard">
+      <div class="challenge-icon">&#127919;</div>
+      <div style="flex:1">
+        <h4>Practical Challenge: ${m.challenge.title} ${moduleDone?'&nbsp;&#10003;':''}</h4>
+        <p>${allLessonsDone? "Hands-on simulation — put the module's concepts to work." : "Locked — complete all lessons above first."}</p>
+      </div>
+    </div>
+  `;
+  app.querySelectorAll(".lesson-row").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const li = parseInt(el.dataset.idx);
+      if(!isLessonUnlocked(state.moduleIdx, li)) return;
+      go("lesson", {lessonIdx:li, step:0, quizIdx:0});
+    });
+  });
+  document.getElementById("challengeCard").addEventListener("click",()=>{
+    if(!allLessonsDone) return;
+    go("challenge", {});
+  });
+}
+
+/* ---------------- LESSON FLOW ---------------- */
+const STEP_META = [
+  {label:"MISSION BRIEF", color:"var(--pink)"},
+  {label:"CONCEPT", color:"var(--purple)"},
+  {label:"REAL-WORLD EXAMPLE", color:"var(--navy-soft)"},
+  {label:"INTERACTIVE GAME", color:"var(--green)"},
+  {label:"QUICK QUIZ", color:"var(--pink)"},
+];
+
+function renderLesson(app){
+  const m = MODULES[state.moduleIdx];
+  const l = m.lessons[state.lessonIdx];
+  const step = state.step;
+  let body = "";
+
+  if(step===0){
+    body = `<div class="brief-box">${l.brief}</div>
+      <div class="nav-row" style="margin-top:16px;justify-content:flex-end;">
+        <button class="btn btn-primary" id="nextBtn">Continue &rarr;</button>
+      </div>`;
+  } else if(step===1){
+    body = `<div class="concept-box">${l.concept.map(c=>`<p>${c}</p>`).join("")}</div>
+      <div class="nav-row" style="margin-top:16px;justify-content:flex-end;">
+        <button class="btn btn-primary" id="nextBtn">Continue &rarr;</button>
+      </div>`;
+  } else if(step===2){
+    body = `<div class="example-title">${l.exampleTitle}</div>
+      <div class="example-box">${l.example.map(p=>`<p>${p}</p>`).join("")}</div>
+      <div class="nav-row" style="margin-top:16px;justify-content:flex-end;">
+        <button class="btn btn-primary" id="nextBtn">Continue &rarr;</button>
+      </div>`;
+  } else if(step===3){
+    body = renderGame(l.game);
+  } else if(step===4){
+    body = renderQuiz(l);
+  }
+
+  app.innerHTML = `
+    <div class="card">
+      <span class="step-pill" style="background:${STEP_META[step].color}">Step ${step+1} of 5 &middot; ${STEP_META[step].label}</span>
+      <div class="lesson-header">Lesson ${state.moduleIdx+1}.${state.lessonIdx+1}</div>
+      <div class="lesson-title">${l.title}</div>
+      ${body}
+    </div>
+  `;
+
+  if(step<3){
+    document.getElementById("nextBtn").addEventListener("click",()=>{
+      state.step++; render();
+    });
+  }
+  if(step===3){ wireGame(l.game); }
+  if(step===4){ wireQuiz(l); }
+}
+
+/* ---------- GAME RENDERING ---------- */
+function renderGame(game){
+  let board = "";
+  if(game.type==="sort"){
+    const bClass = game.buckets.length<=2?'b2':(game.buckets.length===3?'b3':'b4');
+    board = `
+      <div class="game-board">
+        <div class="item-pool" id="itemPool">
+          ${game.items.map((it,i)=>`<div class="item-chip" data-i="${i}">${it[0]}</div>`).join("")}
+        </div>
+        <div class="buckets ${bClass}" id="buckets">
+          ${game.buckets.map((b,bi)=>`<div class="bucket" data-bucket="${b}">
+            <h5>${b}</h5><div class="bucket-items"></div>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div class="feedback" id="gameFeedback"></div>
+      <div class="nav-row" style="margin-top:16px;">
+        <button class="btn btn-ghost" id="resetGameBtn">Reset</button>
+        <button class="btn btn-primary" id="gameNextBtn" disabled>Continue &rarr;</button>
+      </div>`;
+  } else if(game.type==="match"){
+    const left = game.pairs.map((p,i)=>({t:p[0],i,side:'l'}));
+    const right = game.pairs.map((p,i)=>({t:p[1],i,side:'r'})).sort(()=>Math.random()-0.5);
+    board = `
+      <div class="game-board">
+        <div class="match-grid">
+          <div class="match-col"><h5>Tap first</h5>${left.map(x=>`<div class="match-item" data-side="l" data-i="${x.i}">${x.t}</div>`).join("")}</div>
+          <div class="match-col"><h5>Then tap the match</h5>${right.map(x=>`<div class="match-item" data-side="r" data-i="${x.i}">${x.t}</div>`).join("")}</div>
+        </div>
+      </div>
+      <div class="feedback" id="gameFeedback"></div>
+      <div class="nav-row" style="margin-top:16px;">
+        <button class="btn btn-ghost" id="resetGameBtn">Reset</button>
+        <button class="btn btn-primary" id="gameNextBtn" disabled>Continue &rarr;</button>
+      </div>`;
+  } else if(game.type==="order"){
+    const shuffled = game.items.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5);
+    board = `
+      <div class="game-board">
+        <div class="item-pool" id="itemPool">
+          ${shuffled.map(x=>`<div class="item-chip" data-i="${x.i}">${x.t}</div>`).join("")}
+        </div>
+        <div class="order-list" id="orderList">
+          ${game.items.map((_,i)=>`<div class="order-slot" data-slot="${i}">Slot ${i+1}</div>`).join("")}
+        </div>
+      </div>
+      <div class="feedback" id="gameFeedback"></div>
+      <div class="nav-row" style="margin-top:16px;">
+        <button class="btn btn-ghost" id="resetGameBtn">Reset</button>
+        <button class="btn btn-primary" id="gameNextBtn" disabled>Continue &rarr;</button>
+      </div>`;
+  }
+  return `<div class="game-title">${game.title}</div><div class="game-desc">${game.desc}</div>${board}`;
+}
+
+function wireGame(game){
+  const fb = document.getElementById("gameFeedback");
+  const nextBtn = document.getElementById("gameNextBtn");
+  document.getElementById("resetGameBtn").addEventListener("click",()=>render());
+
+  if(game.type==="sort"){
+    let selected = null;
+    let placedCount = 0;
+    const total = game.items.length;
+    document.querySelectorAll("#itemPool .item-chip").forEach(chip=>{
+      chip.addEventListener("click",()=>{
+        if(chip.classList.contains("placed")) return;
+        document.querySelectorAll("#itemPool .item-chip").forEach(c=>c.classList.remove("selected"));
+        chip.classList.add("selected");
+        selected = chip;
+      });
+    });
+    document.querySelectorAll("#buckets .bucket").forEach(bucket=>{
+      bucket.addEventListener("click",()=>{
+        if(!selected) return;
+        const i = parseInt(selected.dataset.i);
+        const correct = game.items[i][1] === bucket.dataset.bucket;
+        const div = document.createElement("div");
+        div.className = "placed-item " + (correct?"correct":"wrong");
+        div.textContent = game.items[i][0] + (correct? "  ✓" : "  ✗");
+        bucket.querySelector(".bucket-items").appendChild(div);
+        selected.classList.add("placed");
+        selected = null;
+        placedCount++;
+        if(!correct) loseHeart();
+        if(placedCount===total){
+          fb.className = "feedback show ok";
+          fb.textContent = "Nice work — every item is sorted. Continue when ready.";
+          nextBtn.disabled = false;
+        }
+      });
+    });
+  }
+
+  if(game.type==="match"){
+    let selL=null, selR=null;
+    let matchedCount=0;
+    const total = game.pairs.length;
+    function tryMatch(){
+      if(selL===null || selR===null) return;
+      const li = parseInt(selL.dataset.i), ri = parseInt(selR.dataset.i);
+      if(li===ri){
+        selL.classList.remove("selected"); selR.classList.remove("selected");
+        selL.classList.add("matched"); selR.classList.add("matched");
+        matchedCount++;
+        if(matchedCount===total){
+          fb.className="feedback show ok"; fb.textContent="All matched correctly. Continue when ready.";
+          nextBtn.disabled=false;
+        }
+      } else {
+        loseHeart();
+        [selL,selR].forEach(el=>{el.classList.add("wrongflash");});
+        setTimeout(()=>{ [selL,selR].forEach(el=>el.classList.remove("wrongflash","selected")); },450);
+      }
+      selL=null; selR=null;
+    }
+    document.querySelectorAll('.match-item[data-side="l"]').forEach(el=>{
+      el.addEventListener("click",()=>{
+        if(el.classList.contains("matched")) return;
+        document.querySelectorAll('.match-item[data-side="l"]').forEach(x=>x.classList.remove("selected"));
+        el.classList.add("selected"); selL=el; tryMatch();
+      });
+    });
+    document.querySelectorAll('.match-item[data-side="r"]').forEach(el=>{
+      el.addEventListener("click",()=>{
+        if(el.classList.contains("matched")) return;
+        document.querySelectorAll('.match-item[data-side="r"]').forEach(x=>x.classList.remove("selected"));
+        el.classList.add("selected"); selR=el; tryMatch();
+      });
+    });
+  }
+
+  if(game.type==="order"){
+    let nextSlot = 0;
+    document.querySelectorAll("#itemPool .item-chip").forEach(chip=>{
+      chip.addEventListener("click",()=>{
+        if(chip.classList.contains("placed")) return;
+        const i = parseInt(chip.dataset.i);
+        const slot = document.querySelector(`.order-slot[data-slot="${nextSlot}"]`);
+        const correct = i === nextSlot;
+        slot.classList.add("filled");
+        slot.innerHTML = `<span class="step-no">${nextSlot+1}</span>${game.items[i]}` + (correct?" &#10003;":" &#10007;");
+        slot.style.borderColor = correct? "var(--green-line)" : "#F5C2C2";
+        slot.style.background = correct? "var(--green-soft)" : "var(--red-soft)";
+        if(!correct) loseHeart();
+        chip.classList.add("placed");
+        nextSlot++;
+        if(nextSlot===game.items.length){
+          fb.className="feedback show ok"; fb.textContent="Sequence complete. Continue when ready.";
+          nextBtn.disabled=false;
+        }
+      });
+    });
+  }
+
+  nextBtn.addEventListener("click",()=>{ state.step++; render(); });
+}
+
+/* ---------- QUIZ ---------- */
+function renderQuiz(l){
+  const qi = state.quizIdx;
+  const q = l.quiz[qi];
+  const letters = ["A","B","C","D"];
+  return `
+    <div class="quiz-progress">
+      ${l.quiz.map((_,i)=>`<span class="${i<qi?'done':(i===qi?'current':'')}"></span>`).join("")}
+    </div>
+    <div class="quiz-q">Q${qi+1}. ${q.q}</div>
+    <div id="quizOpts">
+      ${q.opts.map((o,i)=>`<div class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span>${o}</div>`).join("")}
+    </div>
+    <div class="feedback" id="quizFeedback"></div>
+    <div class="nav-row" style="margin-top:14px;justify-content:flex-end;">
+      <button class="btn btn-primary" id="quizNextBtn" disabled>Continue &rarr;</button>
+    </div>
+  `;
+}
+function wireQuiz(l){
+  const qi = state.quizIdx;
+  const q = l.quiz[qi];
+  const fb = document.getElementById("quizFeedback");
+  const nextBtn = document.getElementById("quizNextBtn");
+  let answered = false;
+  document.querySelectorAll("#quizOpts .quiz-opt").forEach(opt=>{
+    opt.addEventListener("click",()=>{
+      if(answered) return;
+      answered = true;
+      const i = parseInt(opt.dataset.i);
+      document.querySelectorAll("#quizOpts .quiz-opt").forEach(o=>o.classList.add("disabled"));
+      if(i===q.a){
+        opt.classList.add("correct");
+        fb.className="feedback show ok"; fb.textContent="Correct!";
+        addXP(10);
+      } else {
+        opt.classList.add("wrong");
+        document.querySelector(`#quizOpts .quiz-opt[data-i="${q.a}"]`).classList.add("correct");
+        fb.className="feedback show bad"; fb.textContent="Not quite — correct answer highlighted above.";
+        loseHeart();
+      }
+      nextBtn.disabled = false;
+    });
+  });
+  nextBtn.addEventListener("click",()=>{
+    if(state.quizIdx < l.quiz.length-1){
+      state.quizIdx++; render();
+    } else {
+      state.completedLessons.add(lessonKey(state.moduleIdx, state.lessonIdx));
+      addXP(20);
+      go("lessonComplete", {});
+    }
+  });
+}
+
+/* ---------- LESSON COMPLETE ---------- */
+function renderLessonComplete(app){
+  const m = MODULES[state.moduleIdx];
+  const isLastLesson = state.lessonIdx === m.lessons.length-1;
+  app.innerHTML = `
+    <div class="card complete-wrap">
+      <div class="complete-emoji">&#127881;</div>
+      <h2>Lesson Complete!</h2>
+      <p>${m.lessons[state.lessonIdx].title}</p>
+      <div class="xp-pill">&#9889; +20 XP earned</div><br/>
+      <button class="btn btn-primary" id="continueBtn">${isLastLesson? "Go to Practical Challenge &rarr;" : "Next Lesson &rarr;"}</button>
+    </div>
+  `;
+  document.getElementById("continueBtn").addEventListener("click",()=>{
+    if(isLastLesson){
+      go("module", {});
+    } else {
+      go("lesson", {lessonIdx: state.lessonIdx+1, step:0, quizIdx:0});
+    }
+  });
+}
+
+/* ---------- CHALLENGE (TryHackMe-style simulated terminal) ---------- */
+function renderChallenge(app){
+  const m = MODULES[state.moduleIdx];
+  const c = m.challenge;
+  app.innerHTML = `
+    <div class="card">
+      <span class="step-pill" style="background:var(--purple)">Practical Challenge</span>
+      <div class="lesson-header">Module ${m.num}</div>
+      <div class="lesson-title">${c.title}</div>
+      <p style="font-size:13.5px;color:var(--navy-soft);line-height:1.6;margin-top:-6px;">${c.intro}</p>
+      <div class="terminal" id="termOut"><span class="prompt">redteamer@cyberthulir</span>:~$ <span style="opacity:.5">ready</span></div>
+      <div class="cmd-buttons" id="cmdButtons">
+        ${c.terminal.map((t,i)=>`<button class="cmd-btn" data-i="${i}">${t.cmd}</button>`).join("")}
+      </div>
+      <div id="answerArea" class="hidden">
+        <p style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">${c.question}</p>
+        <div class="answer-row">
+          <input type="text" class="answer-input" id="answerInput" placeholder="Type your answer...">
+          <button class="btn btn-primary" id="submitAnswerBtn">Submit</button>
+        </div>
+        <div class="feedback" id="challengeFeedback"></div>
+      </div>
+    </div>
+  `;
+  const term = document.getElementById("termOut");
+  let runCount = 0;
+  document.querySelectorAll("#cmdButtons .cmd-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i = parseInt(btn.dataset.i);
+      const t = c.terminal[i];
+      term.innerHTML += `\n<span class="prompt">redteamer@cyberthulir</span>:~$ <span class="cmd">${t.cmd}</span>\n<span class="out">${t.out}</span>`;
+      term.scrollTop = term.scrollHeight;
+      btn.classList.add("used"); btn.disabled = true;
+      runCount++;
+      if(runCount===c.terminal.length){
+        document.getElementById("answerArea").classList.remove("hidden");
+      }
+    });
+  });
+  document.getElementById("submitAnswerBtn")?.addEventListener("click", submitChallengeAnswer);
+  document.getElementById("answerInput")?.addEventListener("keydown", e=>{ if(e.key==="Enter") submitChallengeAnswer(); });
+}
+function submitChallengeAnswer(){
+  const m = MODULES[state.moduleIdx];
+  const c = m.challenge;
+  const val = document.getElementById("answerInput").value.trim().toLowerCase();
+  const fb = document.getElementById("challengeFeedback");
+  const ok = c.accept.some(tok=>val.includes(tok));
+  if(ok){
+    fb.className="feedback show ok";
+    fb.innerHTML = c.successMsg;
+    document.getElementById("submitAnswerBtn").disabled = true;
+    document.getElementById("answerInput").disabled = true;
+    state.completedModules.add(state.moduleIdx);
+    addXP(c.xp);
+    setTimeout(()=> go("moduleComplete", {}), 900);
+  } else {
+    fb.className="feedback show bad";
+    fb.textContent = "Not quite. Hint: " + c.hint;
+    loseHeart();
+  }
+}
+
+/* ---------- MODULE COMPLETE ---------- */
+function renderModuleComplete(app){
+  const m = MODULES[state.moduleIdx];
+  const nextLocked = state.moduleIdx === MODULES.length-1;
+  app.innerHTML = `
+    <div class="card complete-wrap">
+      <div class="complete-emoji">&#127942;</div>
+      <h2>Module Complete!</h2>
+      <p>${m.title}</p>
+      <div class="badge-card">
+        <div class="icon">&#127942;</div>
+        <div style="text-align:left;"><b>${m.challenge.badge}</b><span>Badge unlocked</span></div>
+      </div><br/>
+      <div class="xp-pill">&#9889; +${m.challenge.xp} XP earned</div><br/>
+      <button class="btn btn-primary" id="continueBtn">${nextLocked? "Back to Path" : "Continue to Module "+MODULES[state.moduleIdx+1].num+" &rarr;"}</button>
+    </div>
+  `;
+  document.getElementById("continueBtn").addEventListener("click",()=>{
+    state.history = [];
+    go("home", {});
+  });
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+render();
+</script>
+</body>
+</html>
